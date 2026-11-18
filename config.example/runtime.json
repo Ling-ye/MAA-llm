@@ -1,0 +1,9 @@
+{
+  "installations": {"arknights": "", "gf2": "", "endfield": ""},
+  "paths": {"gf2_game": "", "endfield_launcher": "", "endfield_game": ""},
+  "execution": {
+    "arknights": {"enabled": false, "not_before_game_day": ""},
+    "gf2": {"enabled": false, "not_before_game_day": ""},
+    "endfield": {"enabled": false, "not_before_game_day": ""}
+  }
+}

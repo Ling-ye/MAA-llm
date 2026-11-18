@@ -1,0 +1,4 @@
+interface:
+  display_name: "明日方舟日常"
+  short_description: "监督执行 TL-9、公招、基建、信用购买与奖励并保留证据"
+  default_prompt: "使用 $maa-arknights 检查当天状态，并在授权范围内监督对应游戏日常。"

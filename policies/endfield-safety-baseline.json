@@ -1,0 +1,9 @@
+{
+  "framework": "v5.16.1",
+  "version": "v3.1.0",
+  "sha256": {
+    "resource/pipeline/nodes.json": "89a97aba3eb1a1fc96ffb9d9778309eb3d1b1d69908dd713b02a884e66ef2b85",
+    "interface.json": "257c2a436b7fd17b1cd6ad2a0891b2645cabace0d08b02363215aabe82536e2d",
+    "tasks/ProtocolSpace.json": "067ed90b5f7e9c05fffd1a51f521d4b72ab27c423f26a411c955687eaecfb398"
+  }
+}

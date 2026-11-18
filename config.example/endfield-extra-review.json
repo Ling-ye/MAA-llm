@@ -1,0 +1,17 @@
+{
+  "game_day": "YYYY-MM-DD",
+  "phase": "credit-buy",
+  "region": null,
+  "unit": "Oroberyl",
+  "cycle": 0,
+  "supervised": false,
+  "reviewed_at": "YYYY-MM-DDTHH:MM:SS+08:00",
+  "evidence": {
+    "path": "scripts/evidence/replace-with-current-page.png",
+    "sha256": "REPLACE_WITH_SHA256"
+  },
+  "price": 300,
+  "balance": 500,
+  "currency": "Credits",
+  "targets_reviewed_first": false
+}

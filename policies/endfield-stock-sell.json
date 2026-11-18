@@ -1,0 +1,27 @@
+{
+  "selected_options": {
+    "AutoSellValleyIV": "Yes",
+    "AutoSellTicketOverflowValleyIV": {
+      "AutoSellTicketOverflowValleyIVValue": "30000000"
+    },
+    "AutoSellWuling": "Yes",
+    "AutoSellTicketOverflowWuling": {
+      "AutoSellTicketOverflowWulingValue": "30000000"
+    },
+    "AutoSellPriceType": "AutoSellPriceTypePerCategory",
+    "AutoSellPricePerCategory": {
+      "AutoSellPricePerCategoryModeratePriceVolatilityValue": "4600",
+      "AutoSellPricePerCategoryLargePriceVolatilityValue": "5000",
+      "AutoSellPricePerCategoryMassivePriceVolatilityValue": "5300"
+    }
+  },
+  "tasks": [
+    {
+      "entry": "AutoSellMain",
+      "task_name": "AutoSell",
+      "selected_task_id": "dot-stock-sell",
+      "pipeline_override": "[{\"EnterCameraModeLongPress\": {\"key\": 82}, \"EnterCameraModeKeyUp\": {\"key\": 82}, \"AutoCollectClickKey\": {\"key\": 70}, \"MapNavigatorInteract\": {\"key\": 70}, \"AutoSellPressStockRedistribution\": {\"key\": 70}, \"VisitFriendsPressStockRedistribution\": {\"key\": 70}, \"AutoPickFalls\": {\"key\": 70}, \"AutoPickInteractive\": {\"key\": 70}, \"ProtocolSpaceTouchExitTouch\": {\"key\": 70}, \"ProtocolSpaceTouchExitTouchRetry\": {\"key\": 70}, \"AutoMissionNpcProxyTrackCurrentMission\": {\"key\": 86}}, {\"__AutoFightActionComboClick\": {\"key\": 69}, \"__AutoFightActionSkillOperators1\": {\"key\": 49}, \"__AutoFightActionSkillOperators2\": {\"key\": 50}, \"__AutoFightActionSkillOperators3\": {\"key\": 51}, \"__AutoFightActionSkillOperators4\": {\"key\": 52}, \"__AutoFightActionEndSkillOperators1\": {\"key\": 49}, \"__AutoFightActionEndSkillOperators2\": {\"key\": 50}, \"__AutoFightActionEndSkillOperators3\": {\"key\": 51}, \"__AutoFightActionEndSkillOperators4\": {\"key\": 52}, \"__AutoFightActionSwitchCharacterOperators1\": {\"key\": 112}, \"__AutoFightActionSwitchCharacterOperators2\": {\"key\": 113}, \"__AutoFightActionSwitchCharacterOperators3\": {\"key\": 114}, \"__AutoFightActionSwitchCharacterOperators4\": {\"key\": 115}}, {\"MapNavigatorZiplinePreference\": {\"attach\": {\"zipline\": \"auto\"}}}, {\"AutoSellScanValleyIVMain\": {\"enabled\": true}, \"AutoSellExecuteValleyIVMain\": {\"enabled\": true}}, {\"AutoSellTicketValleyIVOverflow\": {\"custom_recognition_param\": {\"expression\": \"30000000 < {AutoSellOwnTicketCountRecognition}\", \"focus_matched_resolved_expression\": true}}}, {\"AutoSellScanWulingMain\": {\"enabled\": true}, \"AutoSellExecuteWulingMain\": {\"enabled\": true}}, {\"AutoSellTicketWulingOverflow\": {\"custom_recognition_param\": {\"expression\": \"30000000 < {AutoSellOwnTicketCountRecognition}\", \"focus_matched_resolved_expression\": true}}}, {\"AutoSellExecuteValleyIVMain\": {\"custom_action_param\": {\"region\": \"ValleyIV\", \"moderate_price\": 4600, \"large_price\": 5000, \"massive_price\": 5300}}, \"AutoSellExecuteWulingMain\": {\"custom_action_param\": {\"region\": \"Wuling\", \"moderate_price\": 4600, \"large_price\": 5000, \"massive_price\": 5300}}}, {\"AutoStockpileAttach\": {\"attach\": {\"allow_data_upload\": false, \"min_buy\": false}}, \"AutoStockpileGetUid\": {\"enabled\": false}, \"AutoStockpileEnterRegionalDevelopment\": {\"enabled\": false}}]"
+    }
+  ],
+  "budget_note": "Native dynamic purchase quantity; no independently verified hard spending cap. Existing approved elastic-material strategy only."
+}

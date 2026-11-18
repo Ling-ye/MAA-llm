@@ -1,0 +1,3 @@
+# Python 3.12 standard library only for preview, bootstrap and offline tests.
+# Runtime SDKs come from separately downloaded, pinned upstream releases.
+# GF2 execution uses its release's bundled Python; do not mix SDK versions.

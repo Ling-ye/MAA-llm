@@ -1,0 +1,28 @@
+{
+  "entries": [
+    "AutoSweepBattleSupplyOperationPrepare",
+    "returnToHomePage"
+  ],
+  "pipeline_override": {
+    "supplyOperationType": {
+      "expected": "^决策构象$"
+    },
+    "UserSetSliderValue": {
+      "enabled": false
+    },
+    "exitAutoSweepBattleTask": {
+      "enabled": false
+    },
+    "supplyOperationTypeIsAccessories": {
+      "enabled": false
+    },
+    "AutoSweepBattleSupplyOperationPrepareIsAccessories": {
+      "enabled": false
+    },
+    "StartGame_restartGF2Game": {
+      "enabled": false
+    }
+  },
+  "precondition": "Supervisor confirms highest unlocked sweepable breakthrough level and has opened its sweep preparation. This entry does NOT choose a level. Natural stamina only.",
+  "live_validated": false
+}

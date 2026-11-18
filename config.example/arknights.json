@@ -1,0 +1,31 @@
+{
+  "game": "arknights",
+  "ready": false,
+  "maa_dir": "",
+  "adb_path": "",
+  "mumu_cli": "",
+  "vm_index": 0,
+  "serial": "127.0.0.1:16384",
+  "expected_version": "v6.22.0",
+  "task_timeout_seconds": 3600,
+  "fight": {
+    "enabled": true,
+    "stage": "TL-9",
+    "times": 100
+  },
+  "recruit": {
+    "enabled": false,
+    "times": 3
+  },
+  "infrast": {
+    "enabled": false
+  },
+  "mall": {
+    "enabled": true,
+    "shopping": false
+  },
+  "award": {
+    "enabled": true,
+    "mail": true
+  }
+}

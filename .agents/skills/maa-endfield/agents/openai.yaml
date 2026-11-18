@@ -1,0 +1,4 @@
+interface:
+  display_name: "终末地日常"
+  short_description: "监督终末地日常、礼物、仓储转交尾款与信用回收，保留证据和防重"
+  default_prompt: "使用 $maa-endfield 检查当天状态、待收尾款与独立账本，并按授权监督终末地日常。"

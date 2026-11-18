@@ -1,0 +1,107 @@
+{
+  "game": "gf2",
+  "version": "v2.8.4",
+  "kind": "supplemental_plan_only_not_executed",
+  "entries": [
+    "returnToHomePage",
+    "开始活动层任务",
+    "returnToHomePage",
+    "开始助战奖励领取",
+    "returnToHomePage"
+  ],
+  "pipeline_override": {
+    "使用完接入密钥(体力药水)": {
+      "enabled": false
+    },
+    "商城免费每日补给箱购买": {
+      "enabled": false
+    },
+    "DispatchCenter-mysteryBox": {
+      "enabled": false
+    },
+    "开始动态招募祝福任务": {
+      "enabled": false
+    },
+    "开始巡录任务": {
+      "enabled": false
+    },
+    "边界推进委托领取": {
+      "enabled": false
+    },
+    "领取班组奖励": {
+      "enabled": false
+    },
+    "开始茶歇一刻任务": {
+      "enabled": false
+    },
+    "开始逸趣导算任务": {
+      "enabled": false
+    },
+    "Planting-Replant": {
+      "enabled": false
+    },
+    "Planting-EnterCultivationToReplant": {
+      "enabled": false
+    },
+    "Planting-OpenUprootDialog": {
+      "enabled": false
+    },
+    "Planting-ConfirmUprootDialog": {
+      "enabled": false
+    },
+    "Planting-ClickConfirmUproot": {
+      "enabled": false
+    },
+    "Planting-ClickProceed": {
+      "enabled": false
+    },
+    "已进入栽培页面": {
+      "enabled": false
+    },
+    "Planting-SelectSeed": {
+      "enabled": false
+    },
+    "Planting-ConfirmSow": {
+      "enabled": false
+    },
+    "开始活动层任务": {
+      "next": [
+        "[JumpBack]任务开始前进入活动层-活动层通用",
+        "[JumpBack]切换形象为指挥官-活动层通用",
+        "[JumpBack]开始美味烹调任务",
+        "[JumpBack]Planting-Start",
+        "退出活动层-活动层通用"
+      ]
+    },
+    "Planting-ConfirmPlantTab": {
+      "next": [
+        "返回活动层-活动层通用"
+      ]
+    }
+  },
+  "exact_subtask_entries": {
+    "free_cooking": "开始美味烹调任务",
+    "water_existing_plant": "Planting-Start",
+    "support_reward": "开始助战奖励领取"
+  },
+  "preconditions": [
+    "Signed-in home screen, correct PC game hwnd, no other MAA task",
+    "Official agent scroll_end registration and base+resource_pc loaded",
+    "Inspect current screenshot before first input",
+    "Use existing overall safety lock, STOP and bounded timeout; do not bypass failed-day replay gate by running entire daily again"
+  ],
+  "safety": [
+    "Cooking only OCR 每日首次免费; no paid fallback",
+    "No flower: recognize 当前未种植花朵 and return, never sow",
+    "Existing flower only: 今日未浇水 leads to watering; replant/sow nodes disabled",
+    "Tea and recreation-reward branches excluded",
+    "Support entry on home only: PC version uses Esc to open personal info",
+    "No combat, medicine, purchases, dismantle or reward-box selection"
+  ],
+  "verification": [
+    "Capture before and after each entry",
+    "MAA success alone is not proof; inspect cooking/watering daily counters",
+    "Support reward does not guarantee daily activity",
+    "Daily-order reward collection after these actions is separate; do not blindly rerun ClaimRewardTasks because milestone branch is broken"
+  ]
+}

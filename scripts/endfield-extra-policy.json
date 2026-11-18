@@ -1,0 +1,782 @@
+{
+  "schema": 1,
+  "maa_version": "v3.1.0",
+  "framework_version": "v5.16.1",
+  "base": [
+    {
+      "EnterCameraModeLongPress": {
+        "key": 82
+      },
+      "EnterCameraModeKeyUp": {
+        "key": 82
+      },
+      "AutoCollectClickKey": {
+        "key": 70
+      },
+      "MapNavigatorInteract": {
+        "key": 70
+      },
+      "AutoSellPressStockRedistribution": {
+        "key": 70
+      },
+      "VisitFriendsPressStockRedistribution": {
+        "key": 70
+      },
+      "AutoPickFalls": {
+        "key": 70
+      },
+      "AutoPickInteractive": {
+        "key": 70
+      },
+      "ProtocolSpaceTouchExitTouch": {
+        "key": 70
+      },
+      "ProtocolSpaceTouchExitTouchRetry": {
+        "key": 70
+      },
+      "AutoMissionNpcProxyTrackCurrentMission": {
+        "key": 86
+      }
+    },
+    {
+      "__AutoFightActionComboClick": {
+        "key": 69
+      },
+      "__AutoFightActionSkillOperators1": {
+        "key": 49
+      },
+      "__AutoFightActionSkillOperators2": {
+        "key": 50
+      },
+      "__AutoFightActionSkillOperators3": {
+        "key": 51
+      },
+      "__AutoFightActionSkillOperators4": {
+        "key": 52
+      },
+      "__AutoFightActionEndSkillOperators1": {
+        "key": 49
+      },
+      "__AutoFightActionEndSkillOperators2": {
+        "key": 50
+      },
+      "__AutoFightActionEndSkillOperators3": {
+        "key": 51
+      },
+      "__AutoFightActionEndSkillOperators4": {
+        "key": 52
+      },
+      "__AutoFightActionSwitchCharacterOperators1": {
+        "key": 112
+      },
+      "__AutoFightActionSwitchCharacterOperators2": {
+        "key": 113
+      },
+      "__AutoFightActionSwitchCharacterOperators3": {
+        "key": 114
+      },
+      "__AutoFightActionSwitchCharacterOperators4": {
+        "key": 115
+      }
+    },
+    {
+      "MapNavigatorZiplinePreference": {
+        "attach": {
+          "zipline": "auto"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "breeze_of_kjersch": [
+      "耶尔什微风",
+      "耶爾什微風",
+      "Breeze of Kjersch",
+      "イェルシェのそよ風",
+      "옐시의 산들바람"
+    ],
+    "tidestone_specimen": [
+      "浪潮海石",
+      "浪潮海石",
+      "Tidestone Specimen",
+      "潮汐晶石",
+      "물결석"
+    ],
+    "simonch_shawl": [
+      "塞梦珂披巾",
+      "塞夢珂披巾",
+      "Simonch Shawl",
+      "シモンクのショール",
+      "사이몬크 머플러"
+    ],
+    "frontiers_watch": [
+      "《前沿瞭望》",
+      "《前沿瞭望》",
+      "Frontiers Watch",
+      "『Frontiers』",
+      "<전선의 조망>"
+    ],
+    "aurylene_camera": [
+      "醚质相机",
+      "醚質相機",
+      "Aurylene Camera",
+      "オーリレンカメラ",
+      "오리렌 카메라"
+    ],
+    "cosmic_gate_puzzle": [
+      "星门锁",
+      "星門鎖",
+      "Cosmic Gate Puzzle",
+      "星門パズル",
+      "스타게이트 자물쇠"
+    ],
+    "surfing_festival_ticket": [
+      "冲浪大赛门票",
+      "衝浪大賽門票",
+      "Surfing Festival Ticket",
+      "サーフィン大会のチケット",
+      "서핑대회 입장권"
+    ]
+  },
+  "gift_count_controls": {
+    "AutoStockStapleGoodsBreezeOfKjerschValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 > {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsBreezeOfKjerschExcludeValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 <= {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsTidestoneSpecimenValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 > {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsTidestoneSpecimenExcludeValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 <= {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsSimonchShawlValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 > {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsSimonchShawlExcludeValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 <= {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsFrontiersWatchValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 > {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsFrontiersWatchExcludeValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 <= {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsAuryleneCameraValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 > {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsAuryleneCameraExcludeValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 <= {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsCosmicGatePuzzleValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 > {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsCosmicGatePuzzleExcludeValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 <= {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsSurfingFestivalTicketValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 > {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    },
+    "AutoStockStapleGoodsSurfingFestivalTicketExcludeValidate": {
+      "recognition": {
+        "param": {
+          "custom_recognition_param": {
+            "expression": "999999 <= {AutoStockStapleGoodsCountValidate}"
+          }
+        }
+      }
+    }
+  },
+  "depots": {
+    "valleyiv": [
+      "OriginiumSciencePark",
+      "OriginLodespring",
+      "PowerPlateau"
+    ],
+    "wuling": [
+      "WulingCity",
+      "TestArea"
+    ]
+  },
+  "delivery": {
+    "OriginiumSciencePark": [
+      {
+        "DeliveryJobsValleyIV": {
+          "enabled": true
+        }
+      },
+      {
+        "DeliveryJobsWuling": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginiumScienceParkDeliveryJob": {
+          "enabled": true
+        },
+        "DeliveryJobsEnterOriginiumScienceParkCargo": {
+          "enabled": true,
+          "anchor": {
+            "DeliveryJobsSelectPriorityItems": "DeliveryJobsSelectPriorityItemsValleyIV",
+            "DeliveryJobsRedistributionBidAction": "DeliveryJobsDecideQuickTransfer",
+            "DeliveryJobsGoToDepot": "SceneEnterMenuRegionalDevelopmentValleyIVDepotNode",
+            "DeliveryJobsReturnToDepotNode": "SceneEnterMenuRegionalDevelopmentValleyIVDepotNode"
+          }
+        },
+        "DeliveryJobsOngoingDeliveryForOriginiumSciencePark": {
+          "next": [
+            "DeliveryJobsTransferOngoingJob"
+          ]
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginLodespringDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginLodespringCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterPowerPlateauDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterPowerPlateauCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterWulingCityDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterWulingCityCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterTestAreaDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterTestAreaCargo": {
+          "enabled": false
+        }
+      }
+    ],
+    "OriginLodespring": [
+      {
+        "DeliveryJobsValleyIV": {
+          "enabled": true
+        }
+      },
+      {
+        "DeliveryJobsWuling": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginiumScienceParkDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginiumScienceParkCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginLodespringDeliveryJob": {
+          "enabled": true
+        },
+        "DeliveryJobsEnterOriginLodespringCargo": {
+          "enabled": true,
+          "anchor": {
+            "DeliveryJobsSelectPriorityItems": "DeliveryJobsSelectPriorityItemsValleyIV",
+            "DeliveryJobsRedistributionBidAction": "DeliveryJobsDecideQuickTransfer",
+            "DeliveryJobsGoToDepot": "SceneEnterMenuRegionalDevelopmentValleyIVDepotNode",
+            "DeliveryJobsReturnToDepotNode": "SceneEnterMenuRegionalDevelopmentValleyIVDepotNode"
+          }
+        },
+        "DeliveryJobsOngoingDeliveryForOriginLodespring": {
+          "next": [
+            "DeliveryJobsTransferOngoingJob"
+          ]
+        }
+      },
+      {
+        "DeliveryJobsEnterPowerPlateauDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterPowerPlateauCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterWulingCityDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterWulingCityCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterTestAreaDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterTestAreaCargo": {
+          "enabled": false
+        }
+      }
+    ],
+    "PowerPlateau": [
+      {
+        "DeliveryJobsValleyIV": {
+          "enabled": true
+        }
+      },
+      {
+        "DeliveryJobsWuling": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginiumScienceParkDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginiumScienceParkCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginLodespringDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginLodespringCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterPowerPlateauDeliveryJob": {
+          "enabled": true
+        },
+        "DeliveryJobsEnterPowerPlateauCargo": {
+          "enabled": true,
+          "anchor": {
+            "DeliveryJobsSelectPriorityItems": "DeliveryJobsSelectPriorityItemsValleyIV",
+            "DeliveryJobsRedistributionBidAction": "DeliveryJobsDecideQuickTransfer",
+            "DeliveryJobsGoToDepot": "SceneEnterMenuRegionalDevelopmentValleyIVDepotNode",
+            "DeliveryJobsReturnToDepotNode": "SceneEnterMenuRegionalDevelopmentValleyIVDepotNode"
+          }
+        },
+        "DeliveryJobsOngoingDeliveryForPowerPlateau": {
+          "next": [
+            "DeliveryJobsTransferOngoingJob"
+          ]
+        }
+      },
+      {
+        "DeliveryJobsEnterWulingCityDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterWulingCityCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterTestAreaDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterTestAreaCargo": {
+          "enabled": false
+        }
+      }
+    ],
+    "WulingCity": [
+      {
+        "DeliveryJobsValleyIV": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsWuling": {
+          "enabled": true
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginiumScienceParkDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginiumScienceParkCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginLodespringDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginLodespringCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterPowerPlateauDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterPowerPlateauCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterWulingCityDeliveryJob": {
+          "enabled": true
+        },
+        "DeliveryJobsEnterWulingCityCargo": {
+          "enabled": true,
+          "anchor": {
+            "DeliveryJobsSelectPriorityItems": "DeliveryJobsSelectPriorityItemsWuling",
+            "DeliveryJobsRedistributionBidAction": "DeliveryJobsDecideQuickTransfer",
+            "DeliveryJobsGoToDepot": "SceneEnterMenuRegionalDevelopmentWulingDepotNode",
+            "DeliveryJobsReturnToDepotNode": "SceneEnterMenuRegionalDevelopmentWulingDepotNode"
+          }
+        },
+        "DeliveryJobsOngoingDeliveryForWulingCity": {
+          "next": [
+            "DeliveryJobsTransferOngoingJob"
+          ]
+        }
+      },
+      {
+        "DeliveryJobsEnterTestAreaDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterTestAreaCargo": {
+          "enabled": false
+        }
+      }
+    ],
+    "TestArea": [
+      {
+        "DeliveryJobsValleyIV": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsWuling": {
+          "enabled": true
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginiumScienceParkDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginiumScienceParkCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterOriginLodespringDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterOriginLodespringCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterPowerPlateauDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterPowerPlateauCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterWulingCityDeliveryJob": {
+          "enabled": false
+        },
+        "DeliveryJobsEnterWulingCityCargo": {
+          "enabled": false
+        }
+      },
+      {
+        "DeliveryJobsEnterTestAreaDeliveryJob": {
+          "enabled": true
+        },
+        "DeliveryJobsEnterTestAreaCargo": {
+          "enabled": true,
+          "anchor": {
+            "DeliveryJobsSelectPriorityItems": "DeliveryJobsSelectPriorityItemsWuling",
+            "DeliveryJobsRedistributionBidAction": "DeliveryJobsDecideQuickTransfer",
+            "DeliveryJobsGoToDepot": "SceneEnterMenuRegionalDevelopmentWulingDepotNode",
+            "DeliveryJobsReturnToDepotNode": "SceneEnterMenuRegionalDevelopmentWulingDepotNode"
+          }
+        },
+        "DeliveryJobsOngoingDeliveryForTestArea": {
+          "next": [
+            "DeliveryJobsTransferOngoingJob"
+          ]
+        }
+      }
+    ]
+  },
+  "blocked_auto_delivery": [
+    "AutoDelivery",
+    "AutoDeliveryAfterResolveDestination",
+    "AutoDeliveryCheckAreaText",
+    "AutoDeliveryCheckCancelCurrentJobTrackingButton",
+    "AutoDeliveryCheckDeliveryMissionListComplete",
+    "AutoDeliveryCheckDeliveryMissionListItem",
+    "AutoDeliveryCheckDeliveryMissionSelected",
+    "AutoDeliveryCheckDestinationField",
+    "AutoDeliveryCheckDestinationText",
+    "AutoDeliveryCheckDestinationYellowText",
+    "AutoDeliveryCheckFetchGoodsButton",
+    "AutoDeliveryCheckSkipChatButton",
+    "AutoDeliveryCheckSkipChatReady",
+    "AutoDeliveryCheckStartTrackingButton",
+    "AutoDeliveryCheckSubmitGoodsButton",
+    "AutoDeliveryCheckSubmitGoodsName",
+    "AutoDeliveryCheckSubmitGoodsTarget",
+    "AutoDeliveryCloseRewardDialog",
+    "AutoDeliveryCloseRewardDialogClick",
+    "AutoDeliveryDeliveryMissionNotFound",
+    "AutoDeliveryEnd",
+    "AutoDeliveryEnsureDeliveryMissionSelected",
+    "AutoDeliveryFetchGoods",
+    "AutoDeliveryFetchGoodsButton",
+    "AutoDeliveryFindRecycleBinDeliverTargetMap01Lv005Recycle02",
+    "AutoDeliveryFindRecycleBinDeliverTargetMap01Lv005Recycle03",
+    "AutoDeliveryFindRecycleBinDeliverTargetMap01Lv006Recycle01",
+    "AutoDeliveryFindRecycleBinDeliverTargetMap01Lv006Recycle03",
+    "AutoDeliveryFindRecycleBinDeliverTargetMap01Lv007Recycle02",
+    "AutoDeliveryFindRecycleBinDeliverTargetMap01Lv007Recycle03",
+    "AutoDeliveryInChatDialog",
+    "AutoDeliveryInDeliveryMissionDetail",
+    "AutoDeliveryInDestinationMap",
+    "AutoDeliveryInTaskDestinationMap",
+    "AutoDeliveryInWorldAfterQuickTeleport",
+    "AutoDeliveryNavigateDepot",
+    "AutoDeliveryNavigateDestination",
+    "AutoDeliveryNavigateDestinationFailed",
+    "AutoDeliveryOpenDeliveryMission",
+    "AutoDeliveryOpenMissionAfterFetchGoods",
+    "AutoDeliveryQuickTeleport",
+    "AutoDeliveryQuickTeleportClick",
+    "AutoDeliveryQuickTeleportSelect",
+    "AutoDeliveryRecognizeDepot",
+    "AutoDeliveryRecognizeDestination",
+    "AutoDeliveryRecycleBinOriginLodespringInDestinationMap",
+    "AutoDeliveryRecycleBinOriginiumScienceParkInDestinationMap",
+    "AutoDeliveryRecycleBinPowerPlateauInDestinationMap",
+    "AutoDeliveryRetryNavigateDepot",
+    "AutoDeliveryRetryNavigateDestination",
+    "AutoDeliveryReturnWorldAndNavigateDestination",
+    "AutoDeliveryRouteDepotDomain1Lv005Depot1",
+    "AutoDeliveryRouteDepotDomain1Lv005Depot1WithZipline",
+    "AutoDeliveryRouteDepotDomain1Lv006Depot1",
+    "AutoDeliveryRouteDepotDomain1Lv006Depot1WithZipline",
+    "AutoDeliveryRouteDepotDomain1Lv007Depot1",
+    "AutoDeliveryRouteDepotDomain1Lv007Depot1WithZipline",
+    "AutoDeliveryRouteDepotDomain2Lv002Depot1",
+    "AutoDeliveryRouteDepotDomain2Lv002Depot1WithZipline",
+    "AutoDeliveryRouteDepotDomain2Lv005Depot1",
+    "AutoDeliveryRouteDepotDomain2Lv005Depot1WithZipline",
+    "AutoDeliveryRouteDepotRetryDomain1Lv005Depot1",
+    "AutoDeliveryRouteDepotRetryDomain1Lv006Depot1",
+    "AutoDeliveryRouteDepotRetryDomain1Lv007Depot1",
+    "AutoDeliveryRouteDepotRetryDomain2Lv002Depot1",
+    "AutoDeliveryRouteDepotRetryDomain2Lv005Depot1",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00501",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00501WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00502",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00502WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00503",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00503WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv005Recycle02",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv005Recycle02WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv005Recycle03",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv005Recycle03WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00601",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00601WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00602",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00602WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00603",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00603WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv006Recycle01",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv006Recycle01WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv006Recycle03",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv006Recycle03WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00701",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00701WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00702",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00702WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00703",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv00703WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv007Recycle02",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv007Recycle02WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv007Recycle03",
+    "AutoDeliveryRouteDestinationDeliverTargetMap01Lv007Recycle03WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00201",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00201WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00202",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00202WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00203",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00203WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv002Recycle01",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv002Recycle01WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00501",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00501WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00502",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00502WithZipline",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00503",
+    "AutoDeliveryRouteDestinationDeliverTargetMap02Lv00503WithZipline",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00501",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00502",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00503",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv005Recycle02",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv005Recycle03",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00601",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00602",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00603",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv006Recycle01",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv006Recycle03",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00701",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00702",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv00703",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv007Recycle02",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap01Lv007Recycle03",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap02Lv00201",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap02Lv00202",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap02Lv00203",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap02Lv002Recycle01",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap02Lv00501",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap02Lv00502",
+    "AutoDeliveryRouteDestinationRetryDeliverTargetMap02Lv00503",
+    "AutoDeliveryScrollMissionList",
+    "AutoDeliverySearchFetchGoodsButton",
+    "AutoDeliverySearchSubmitGoodsButton",
+    "AutoDeliverySelectDeliveryMission",
+    "AutoDeliverySelectDeliveryMissionFromList",
+    "AutoDeliverySkipChat",
+    "AutoDeliverySkipChatConfirm",
+    "AutoDeliveryStartTrackingRecycleBinOriginLodespring",
+    "AutoDeliveryStartTrackingRecycleBinOriginiumSciencePark",
+    "AutoDeliveryStartTrackingRecycleBinPowerPlateau",
+    "AutoDeliveryStartTrackingTask",
+    "AutoDeliverySubmitGoods",
+    "AutoDeliverySubmitGoodsInteractScan",
+    "AutoDeliverySubmitGoodsInteractText",
+    "AutoDeliveryViewDestinationMap",
+    "AutoDeliveryViewRecycleBinOriginLodespringMap",
+    "AutoDeliveryViewRecycleBinOriginiumScienceParkMap",
+    "AutoDeliveryViewRecycleBinPowerPlateauMap",
+    "DeliveryJobsAuto",
+    "DeliveryJobsAutoDeliveryOriginLodespring",
+    "DeliveryJobsAutoDeliveryOriginiumSciencePark",
+    "DeliveryJobsAutoDeliveryPowerPlateau",
+    "DeliveryJobsAutoDeliveryTestArea",
+    "DeliveryJobsAutoDeliveryWulingCity",
+    "DeliveryJobsDeliverByAutoDelivery",
+    "DeliveryJobsDeliverOngoingByAutoDelivery"
+  ],
+  "resource_hashes": {
+    "tasks/DeliveryJobs.json": "d7a2e614e045eb170dcf4f68b20df634612d734993d9c94f3abf56867d2b4cfb",
+    "tasks/CreditShopping.json": "87b0aae0559525366f4e234e9e2a672f4c06544c416bbecd32cbab029a336f7c",
+    "tasks/ResourceRecycleStation.json": "b5103d629f3886fe175ed3ede38b55835e27b9afafb735f8b055a946c8043f07",
+    "tasks/AutoStockStaple.json": "48160264ac0b4258a3f3de41e7cf873d83748652a5812b4e567f95014fd4b15b",
+    "resource/pipeline/nodes.json": "89a97aba3eb1a1fc96ffb9d9778309eb3d1b1d69908dd713b02a884e66ef2b85"
+  },
+  "limits": {
+    "gift_quantity_each": 10,
+    "gift_unit_price": 6000,
+    "gift_daily_bills": 420000,
+    "cargo_quantity_per_depot": 6000,
+    "credit_daily_spend": 2000,
+    "credit_item_max_price": 400,
+    "refresh_costs": [
+      80,
+      120,
+      160,
+      200
+    ]
+  },
+  "credit_items": {
+    "Oroberyl": "item_diamond",
+    "ArsenalTicket": "item_gachabyproducts_weapongold"
+  }
+}

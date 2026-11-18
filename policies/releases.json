@@ -1,0 +1,26 @@
+{
+  "arknights": {
+    "repository": "MaaAssistantArknights/MaaAssistantArknights",
+    "tag": "v6.22.0",
+    "asset": "MAA-v6.22.0-win-x64.zip",
+    "sha256": "197e3b4c35f56ca75e3fc7cf0a6dfd5467f8aace613bd44626448cf6f8b4756c",
+    "size": 294969951,
+    "entry": "MAA.exe"
+  },
+  "gf2": {
+    "repository": "DarkLingYun/MaaGF2Exilium",
+    "tag": "v2.8.4",
+    "asset": "MaaGF2ExiliumGUI-win-x86_64-v2.8.4.zip",
+    "sha256": "079678b0710b485a55a6165c49b19f5a3a0ce4f9be44842234033c699f3623e2",
+    "size": 259300170,
+    "entry": "MaaGF2Exilium.exe"
+  },
+  "endfield": {
+    "repository": "MaaEnd/MaaEnd",
+    "tag": "v3.1.0",
+    "asset": "MaaEnd-win-x86_64-v3.1.0.zip",
+    "sha256": "afda2a9eb03c04da7875fa8642cd0aaf029c9cc41f01986d744c08716fb1781e",
+    "size": 317210033,
+    "entry": "MaaEnd.exe"
+  }
+}
