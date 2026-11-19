@@ -1,0 +1,873 @@
+{
+  "gift": {
+    "source": "external_supervisor",
+    "before": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "daily-free-gift",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "商城",
+        "品质甄选",
+        "周期礼包",
+        "每日礼包"
+      ],
+      "selected_tab": "每日补给箱",
+      "detail_product": "每日补给箱",
+      "period": "daily",
+      "daily_free_description_confirmed": true,
+      "dialog_unambiguous": true,
+      "reward_overlay_visible": false,
+      "same_detail_price_and_control": true,
+      "paid_offer_selected": false,
+      "price": 0,
+      "price_text": "免费",
+      "currency": "free",
+      "balance": 1000,
+      "progress": 4,
+      "progress_goal": 21,
+      "limit_text": "日限购1/1",
+      "remaining": 1,
+      "control_text": "购买",
+      "control_enabled": true
+    },
+    "after": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "daily-free-gift",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "商城",
+        "品质甄选",
+        "周期礼包",
+        "每日礼包"
+      ],
+      "selected_tab": "每日补给箱",
+      "detail_product": "每日补给箱",
+      "period": "daily",
+      "daily_free_description_confirmed": true,
+      "dialog_unambiguous": true,
+      "reward_overlay_visible": false,
+      "same_detail_price_and_control": true,
+      "paid_offer_selected": false,
+      "price": 0,
+      "price_text": "免费",
+      "currency": "free",
+      "balance": 1000,
+      "progress": 5,
+      "progress_goal": 21,
+      "limit_text": "日限购0/1",
+      "remaining": 0,
+      "control_text": "已售罄",
+      "control_enabled": false
+    }
+  },
+  "squad_supply": {
+    "source": "external_supervisor",
+    "before": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "squad-daily-supply",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "班组",
+        "补给"
+      ],
+      "period": "daily",
+      "dust_frontline": false,
+      "joined_existing_squad": true,
+      "dialog_unambiguous": true,
+      "paid_resources": false,
+      "social_or_role_change": false,
+      "supply_name": "每日补给·五",
+      "source_text": "每日刷新",
+      "selection": "single_verified_item",
+      "claim_all": false,
+      "item_reference": "synthetic-order",
+      "identity_disambiguated": true,
+      "control_text": "领取",
+      "control_enabled": true,
+      "selected_item_claimed": false,
+      "unclaimed_daily_items": 1,
+      "green_check": false,
+      "current_day_claim_record_visible": false
+    },
+    "after": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "squad-daily-supply",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "班组",
+        "补给"
+      ],
+      "period": "daily",
+      "dust_frontline": false,
+      "joined_existing_squad": true,
+      "dialog_unambiguous": true,
+      "paid_resources": false,
+      "social_or_role_change": false,
+      "supply_name": "每日补给·五",
+      "source_text": "每日刷新",
+      "selection": "single_verified_item",
+      "claim_all": false,
+      "item_reference": "synthetic-order",
+      "identity_disambiguated": true,
+      "control_text": "领取",
+      "control_enabled": false,
+      "selected_item_claimed": true,
+      "unclaimed_daily_items": 0,
+      "green_check": true,
+      "current_day_claim_record_visible": true
+    }
+  },
+  "squad_duty": {
+    "source": "external_supervisor",
+    "before": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "squad-daily-duty",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "班组",
+        "要务"
+      ],
+      "period": "daily",
+      "dust_frontline": false,
+      "joined_existing_squad": true,
+      "dialog_unambiguous": true,
+      "paid_resources": false,
+      "social_or_role_change": false,
+      "duty_name": "每日要务IV",
+      "enemy_level": 39,
+      "objective": "全部歼灭",
+      "battle_state": "not_started",
+      "control_text": "开始作战",
+      "entry_cost_reviewed_free": true,
+      "fee_or_currency_prompt": false,
+      "daily_completed_banner": false
+    },
+    "after": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "squad-daily-duty",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "班组",
+        "要务"
+      ],
+      "period": "daily",
+      "dust_frontline": false,
+      "joined_existing_squad": true,
+      "dialog_unambiguous": true,
+      "paid_resources": false,
+      "social_or_role_change": false,
+      "duty_name": "每日要务IV",
+      "enemy_level": 39,
+      "objective": "全部歼灭",
+      "battle_state": "completed",
+      "control_text": "开始作战",
+      "entry_cost_reviewed_free": true,
+      "fee_or_currency_prompt": false,
+      "daily_completed_banner": "每日要务已完成",
+      "result_text": "任务完成",
+      "result_stage": "DW-4 每日要务IV",
+      "reward_confirmed": true,
+      "deployed_count": 5,
+      "deployed_capacity": 5,
+      "formation_supervised": true,
+      "supporting_evidence": {
+        "deployment": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        },
+        "battle_result": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        },
+        "reward": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        }
+      }
+    }
+  },
+  "event_heatdeath": {
+    "source": "external_supervisor",
+    "before": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "heatdeath-supply-202611",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "event": "热寂悖论",
+      "mode": "物资模式",
+      "event_end": "2026-11-24T08:59:00+08:00",
+      "dialog_unambiguous": true,
+      "currency": "准入密钥",
+      "key_scope": "event_supply_only",
+      "key_inventory_cap": 6,
+      "keys": 3,
+      "refill": false,
+      "exchange": false,
+      "ordinary_stamina_spent": false,
+      "paid_currency_spent": false,
+      "challenge_or_story": false,
+      "stage_id": "DF-1-5",
+      "stage_name": "于乱流中 V",
+      "highest_unlocked_reviewed": true,
+      "all_three_objectives_complete": true,
+      "event_state": "open",
+      "panel_title": "自律准备",
+      "control_text": "确认",
+      "control_enabled": true,
+      "selected_runs": 3,
+      "ui_max_runs": 3,
+      "cost_per_run": 1,
+      "total_key_cost": 3,
+      "same_confirmation_cost_and_count": true,
+      "supporting_evidence": {
+        "event_home": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        },
+        "stage": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        },
+        "key_details": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        }
+      }
+    },
+    "after": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "heatdeath-supply-202611",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "event": "热寂悖论",
+      "mode": "物资模式",
+      "event_end": "2026-11-24T08:59:00+08:00",
+      "dialog_unambiguous": true,
+      "currency": "准入密钥",
+      "key_scope": "event_supply_only",
+      "key_inventory_cap": 6,
+      "keys": 0,
+      "refill": false,
+      "exchange": false,
+      "ordinary_stamina_spent": false,
+      "paid_currency_spent": false,
+      "challenge_or_story": false,
+      "stage_id": "DF-1-5",
+      "stage_name": "于乱流中 V",
+      "highest_unlocked_reviewed": true,
+      "all_three_objectives_complete": true,
+      "event_state": "open",
+      "batch_state": "completed",
+      "completed_runs": 3,
+      "reward_name": "火控残片",
+      "reward_quantity": 2400,
+      "reward_inventory": 4000,
+      "supporting_evidence": {
+        "reward": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        },
+        "reward_name": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        }
+      }
+    }
+  },
+  "dispatch_collect": {
+    "source": "external_supervisor",
+    "before": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "dispatch-collect",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "公共区",
+        "调度室"
+      ],
+      "dialog_unambiguous": true,
+      "paid_speedup": false,
+      "team_changes": false,
+      "intelligence_storage": false,
+      "resource_production": false,
+      "mystery_box": false,
+      "weekly_goal": 25,
+      "weekly_count": 15,
+      "dispatch_currency": 1000,
+      "missions": [
+        "前线支援",
+        "物资运输",
+        "紧急谈判",
+        "绝境评测",
+        "遗迹探索"
+      ],
+      "existing_teams_reviewed": true,
+      "completed_teams": 5,
+      "control_text": "一键领取",
+      "control_enabled": true,
+      "dispatch_state": "completed_unclaimed"
+    },
+    "after": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "dispatch-collect",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "公共区",
+        "调度室"
+      ],
+      "dialog_unambiguous": true,
+      "paid_speedup": false,
+      "team_changes": false,
+      "intelligence_storage": false,
+      "resource_production": false,
+      "mystery_box": false,
+      "weekly_goal": 25,
+      "weekly_count": 20,
+      "dispatch_currency": 1500,
+      "missions": [
+        "前线支援",
+        "物资运输",
+        "紧急谈判",
+        "绝境评测",
+        "遗迹探索"
+      ],
+      "existing_teams_reviewed": true,
+      "completed_teams": 5,
+      "control_text": "再次派遣",
+      "control_enabled": true,
+      "dispatch_state": "result",
+      "panel_title": "派遣完成",
+      "collected_teams": 5,
+      "all_five_results_supervised": true,
+      "supporting_evidence": {
+        "post_room": {
+          "path": "evidence/REPLACE.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+        }
+      }
+    }
+  },
+  "dispatch_redispatch": {
+    "source": "external_supervisor",
+    "before": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "dispatch-redispatch",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "公共区",
+        "调度室"
+      ],
+      "dialog_unambiguous": true,
+      "paid_speedup": false,
+      "team_changes": false,
+      "intelligence_storage": false,
+      "resource_production": false,
+      "mystery_box": false,
+      "weekly_goal": 25,
+      "weekly_count": 15,
+      "dispatch_currency": 1500,
+      "missions": [
+        "前线支援",
+        "物资运输",
+        "紧急谈判",
+        "绝境评测",
+        "遗迹探索"
+      ],
+      "existing_teams_reviewed": true,
+      "completed_teams": 5,
+      "control_text": "再次派遣",
+      "control_enabled": true,
+      "dispatch_state": "result",
+      "same_original_teams": true,
+      "configuration_unchanged": true,
+      "no_cost_prompt": true,
+      "panel_title": "派遣完成"
+    },
+    "after": {
+      "schema": 1,
+      "game": "gf2",
+      "phase": "dispatch-redispatch",
+      "version": "v2.8.6",
+      "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+      "supervised": false,
+      "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+      "evidence": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      },
+      "window": {
+        "hwnd": 0,
+        "pid": 0,
+        "title": "少女前线2：追放",
+        "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+        "client_size": [
+          1920,
+          1080
+        ],
+        "foreground": true,
+        "scaled_evidence_confirmed": true
+      },
+      "location": [
+        "公共区",
+        "调度室"
+      ],
+      "dialog_unambiguous": true,
+      "paid_speedup": false,
+      "team_changes": false,
+      "intelligence_storage": false,
+      "resource_production": false,
+      "mystery_box": false,
+      "weekly_goal": 25,
+      "weekly_count": 20,
+      "dispatch_currency": 1500,
+      "missions": [
+        "前线支援",
+        "物资运输",
+        "紧急谈判",
+        "绝境评测",
+        "遗迹探索"
+      ],
+      "existing_teams_reviewed": true,
+      "completed_teams": 5,
+      "control_text": "再次派遣",
+      "control_enabled": true,
+      "dispatch_state": "in_progress",
+      "same_original_teams": true,
+      "configuration_unchanged": true,
+      "no_cost_prompt": true,
+      "panel_title": "派遣完成",
+      "running_teams": 5,
+      "capacity": 5,
+      "claim_available": false,
+      "countdown_by_mission": {
+        "遗迹探索": "19小时59分",
+        "绝境评测": "19小时59分",
+        "紧急谈判": "19小时59分",
+        "前线支援": "19小时59分",
+        "物资运输": "19小时59分"
+      }
+    }
+  },
+  "weekly_5": {
+    "schema": 1,
+    "game": "gf2",
+    "phase": "dispatch-weekly-5",
+    "version": "v2.8.6",
+    "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+    "supervised": false,
+    "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+    "evidence": {
+      "path": "evidence/REPLACE.png",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+    },
+    "window": {
+      "hwnd": 0,
+      "pid": 0,
+      "title": "少女前线2：追放",
+      "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+      "client_size": [
+        1920,
+        1080
+      ],
+      "foreground": true,
+      "scaled_evidence_confirmed": true
+    },
+    "location": [
+      "公共区",
+      "调度室"
+    ],
+    "dialog_unambiguous": true,
+    "paid_speedup": false,
+    "team_changes": false,
+    "intelligence_storage": false,
+    "resource_production": false,
+    "mystery_box": false,
+    "weekly_goal": 25,
+    "weekly_count": 20,
+    "panel_title": "本周派遣收益",
+    "period_key": "2026-11-16",
+    "tier": 5,
+    "same_tier_control_confirmed": true,
+    "tier_state": "claimed",
+    "control_text": "未完成",
+    "control_enabled": false,
+    "green_check": true
+  },
+  "weekly_10": {
+    "schema": 1,
+    "game": "gf2",
+    "phase": "dispatch-weekly-10",
+    "version": "v2.8.6",
+    "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+    "supervised": false,
+    "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+    "evidence": {
+      "path": "evidence/REPLACE.png",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+    },
+    "window": {
+      "hwnd": 0,
+      "pid": 0,
+      "title": "少女前线2：追放",
+      "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+      "client_size": [
+        1920,
+        1080
+      ],
+      "foreground": true,
+      "scaled_evidence_confirmed": true
+    },
+    "location": [
+      "公共区",
+      "调度室"
+    ],
+    "dialog_unambiguous": true,
+    "paid_speedup": false,
+    "team_changes": false,
+    "intelligence_storage": false,
+    "resource_production": false,
+    "mystery_box": false,
+    "weekly_goal": 25,
+    "weekly_count": 20,
+    "panel_title": "本周派遣收益",
+    "period_key": "2026-11-16",
+    "tier": 10,
+    "same_tier_control_confirmed": true,
+    "tier_state": "claimed",
+    "control_text": "未完成",
+    "control_enabled": false,
+    "green_check": true
+  },
+  "weekly_15": {
+    "schema": 1,
+    "game": "gf2",
+    "phase": "dispatch-weekly-15",
+    "version": "v2.8.6",
+    "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+    "supervised": false,
+    "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+    "evidence": {
+      "path": "evidence/REPLACE.png",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+    },
+    "window": {
+      "hwnd": 0,
+      "pid": 0,
+      "title": "少女前线2：追放",
+      "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+      "client_size": [
+        1920,
+        1080
+      ],
+      "foreground": true,
+      "scaled_evidence_confirmed": true
+    },
+    "location": [
+      "公共区",
+      "调度室"
+    ],
+    "dialog_unambiguous": true,
+    "paid_speedup": false,
+    "team_changes": false,
+    "intelligence_storage": false,
+    "resource_production": false,
+    "mystery_box": false,
+    "weekly_goal": 25,
+    "weekly_count": 20,
+    "panel_title": "本周派遣收益",
+    "period_key": "2026-11-16",
+    "tier": 15,
+    "same_tier_control_confirmed": true,
+    "tier_state": "claimed",
+    "control_text": "未完成",
+    "control_enabled": false,
+    "green_check": true
+  },
+  "weekly_25": {
+    "schema": 1,
+    "game": "gf2",
+    "phase": "dispatch-weekly-25",
+    "version": "v2.8.6",
+    "game_day": "REPLACE_WITH_CURRENT_GAME_DAY",
+    "supervised": false,
+    "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+    "evidence": {
+      "path": "evidence/REPLACE.png",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+    },
+    "window": {
+      "hwnd": 0,
+      "pid": 0,
+      "title": "少女前线2：追放",
+      "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+      "client_size": [
+        1920,
+        1080
+      ],
+      "foreground": true,
+      "scaled_evidence_confirmed": true
+    },
+    "location": [
+      "公共区",
+      "调度室"
+    ],
+    "dialog_unambiguous": true,
+    "paid_speedup": false,
+    "team_changes": false,
+    "intelligence_storage": false,
+    "resource_production": false,
+    "mystery_box": false,
+    "weekly_goal": 25,
+    "weekly_count": 20,
+    "panel_title": "本周派遣收益",
+    "period_key": "2026-11-16",
+    "tier": 25,
+    "same_tier_control_confirmed": true,
+    "tier_state": "locked",
+    "control_text": "未完成",
+    "control_enabled": false,
+    "green_check": false
+  }
+}

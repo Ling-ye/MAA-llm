@@ -7,7 +7,7 @@
 | 来源 | 对应版本 | 在本项目中的关系 | 许可 |
 | --- | --- | --- | --- |
 | [MaaAssistantArknights](https://github.com/MaaAssistantArknights/MaaAssistantArknights) | v6.22.0 | 明日方舟运行依赖；任务名、参数及受限配置依据该版本接口 | [AGPL v3](https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/v6.22.0/LICENSE) |
-| [MaaGF2Exilium](https://github.com/DarkLingYun/MaaGF2Exilium) | v2.8.4 | 少前 2 运行依赖；适配器入口和 pipeline 覆盖基于该版本资源 | [MIT](LICENSES/MaaGF2Exilium-MIT.txt)，Copyright (c) 2024 MaaXYZ |
+| [MaaGF2Exilium](https://github.com/DarkLingYun/MaaGF2Exilium) | v2.8.4 / v2.8.6 | 旧执行适配器基于 v2.8.4；新增监督账本审阅 v2.8.6 资源指纹，不调用其混合队列 | [MIT](LICENSES/MaaGF2Exilium-MIT.txt)，Copyright (c) 2024 MaaXYZ |
 | [MaaEnd](https://github.com/MaaEnd/MaaEnd) | v3.1.0 | 终末地运行依赖；任务计划、节点和 pipeline 覆盖基于该版本资源 | [AGPL v3](https://github.com/MaaEnd/MaaEnd/blob/v3.1.0/LICENSE) |
 | [MaaFramework](https://github.com/MaaXYZ/MaaFramework) | v5.16.1（终末地要求） | SDK/API 运行依赖；少前 2 使用其对应 release 自带环境 | [LGPL v3](https://github.com/MaaXYZ/MaaFramework/blob/v5.16.1/LICENSE.md) |
 

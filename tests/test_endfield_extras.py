@@ -162,8 +162,13 @@ class ExtraTests(unittest.TestCase):
         self.assertEqual(audit.validate_record(e.ledger_path(p,self.root),self.root,e.day())["outcome"],"purchased")
         (Path(r["run_dir"])/"request.json").write_text("{}")
         with self.assertRaises(ValueError):audit.validate_record(e.ledger_path(p,self.root),self.root,e.day())
+    def test_valley_legacy_execution_is_disabled_before_api(self):
+        for unit in ("OriginiumSciencePark","OriginLodespring","PowerPlateau"):
+            plan=self.plan("delivery","valleyiv",unit)
+            with self.subTest(unit=unit),self.assertRaisesRegex(ValueError,"automatic submission is disabled"):
+                e.execute(plan,self.review(plan),api=lambda *a,**k: self.fail("unexpected API"),root=self.root)
     def test_delivery_pending_is_not_paid(self):
-        p=self.plan("delivery","valleyiv","PowerPlateau");r,_,_,p=self.run_fake(p,self.review(p))
+        p=self.plan("delivery","wuling","WulingCity");r,_,_,p=self.run_fake(p,self.review(p))
         v=e.verify(Path(r["run_dir"])/"summary.json","transferred_pending",self.png,self.root)
         self.assertFalse(v["tail_payment_received"])
     def test_observation_no_action(self):

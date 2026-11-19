@@ -29,3 +29,9 @@ gf2_safe.py、gf2_supplemental.py、gf2_breakthrough.py 固定 MaaGF2Exilium v2.
 禁体力药/付费补充/抽卡/拆解/不确定奖励箱和未授权购物。锁、STOP、失败回执和截图保留；已有 attempt、版本变化、未注册代理、错误 HWND 或未知结果均阻止继续。
 
 不通过删除 ledger、整体重跑 daily 或修改成功标记补救。维护代码只运行离线测试；本技能不声称 v2.8.6 或喝茶全自动适配已经完成。
+
+## v2.8.6 新增监督入口
+
+先读 [商城、班组、调度室与本期活动](../../../docs/GF2-SUPERVISED-DAILY.md)。使用 scripts/gf2_daily_free_gift.py、gf2_squad_daily.py、gf2_dispatch_daily.py、gf2_heatdeath_supply.py，默认仅计划；--execute 拒绝，没有自动点击后端。每日先读 scripts/gf2_daily_additions_audit.py，分日/阶段/周档防重。
+
+免费箱提交后可能切到同坐标收费礼包，禁止重试/双击/按卡位点击。班组补给与要务独立，禁尘烟前线及社交操作。调度只原队再次派遣，逐档核验本周派遣收益，不进入情报储备/资源生产。活动只本期热寂悖论物资模式 DF-1-5、当前专用准入密钥；战斗截止不能用兑换截止替代。上述画面语义均需监督审核，历史人工完成不是新入口自动化验收。

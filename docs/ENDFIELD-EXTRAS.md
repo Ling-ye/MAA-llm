@@ -1,5 +1,7 @@
 # 终末地新增日常
 
+> 谷地三仓请先读 [独立监督转交](ENDFIELD-VALLEY-TRANSFER.md)。旧 valleyiv delivery 自动提交已拒绝；原生填满不能绑定审核 item_name，已有报价不得重新装箱。以下旧谷地计划仅供审阅，其他地区与阶段不变。
+
 本页适用于 MaaEnd v3.1.0 / MaaFramework v5.16.1。提供的受限范围包括谷地两折礼物、仓储装箱后转交、信用领取与抽卡资源优先购物/刷新、两区远程回收；实际操作仍需当前操作者明确授权。`DeliveryJobs` 是新增仓储阶段，不替代 AutoSell / AutoStockpile；原物资调度价格、库存和弹性购买阈值保持不变。
 
 ## 执行顺序与入口

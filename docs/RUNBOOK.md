@@ -109,3 +109,9 @@ powershell -NoProfile -File scripts/finish-game.ps1 -Game arknights -Receipt scr
 清理回执写在 scripts/cleanup-<game>.json，供协调器链接。全过程保持 partial/unknown 与实际未完成项；关闭动作不等于日常完成。模拟器不由这个脚本自动关闭。
 
 新增礼物、仓储转交/尾款、信用与回收按 [ENDFIELD-EXTRAS.md](ENDFIELD-EXTRAS.md) 执行。2026-11-19 游戏日起统一审计纳入其独立账本；原物资调度阈值不变。
+
+## 新增监督账本
+
+少前2新增四组按 [监督入口](GF2-SUPERVISED-DAILY.md) 分别处理：每日免费补给箱、班组补给/要务、调度领取/原队重派/逐周档、本期活动专用密钥物资模式。v2.8.6 的新入口没有自动点击后端，旧 v2.8.4 版本保护和禁购项不变。
+
+谷地三仓按 [监督转交](ENDFIELD-VALLEY-TRANSFER.md) 处理，旧 endfield_extras.py --phase delivery --region valleyiv 的自动提交已拒绝；已有报价复用，下一步先预约，待接单与尾款到账分开。武陵、物资调度及信用范围不变。收尾额外检查两个新增审计，不伪造旧综合审计成功。

@@ -11,3 +11,6 @@
 | 了解许可和上游来源 | [LICENSE](../LICENSE) 与 [NOTICE.md](../NOTICE.md) |
 
 文档中的占位值需由操作者填入。不得拿示例作为真实画面、运行结果或账号授权。
+
+- [少前2新增监督入口](GF2-SUPERVISED-DAILY.md)：每日免费箱、班组、调度室与本期活动。
+- [谷地三仓监督转交](ENDFIELD-VALLEY-TRANSFER.md)：既有报价复用、分节点防重和尾款待收。

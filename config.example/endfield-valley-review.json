@@ -1,0 +1,187 @@
+{
+  "new_pack": {
+    "schema": 1,
+    "game": "endfield",
+    "version": "v3.1.0",
+    "game_day": "REPLACE_WITH_GAME_DAY",
+    "supervised": false,
+    "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+    "evidence": {
+      "path": "evidence/REPLACE.png",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+    },
+    "window": {
+      "hwnd": 0,
+      "pid": 0,
+      "title": "明日方舟：终末地",
+      "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+      "client_size": [
+        1280,
+        720
+      ],
+      "foreground": true,
+      "scaled_evidence_confirmed": true
+    },
+    "framework": "v5.16.1",
+    "region": "valleyiv",
+    "node": "OriginiumSciencePark",
+    "node_name": "源石研究园",
+    "dialog_unambiguous": true,
+    "node_order_bound": true,
+    "order_reference": "REPLACE_WITH_REVIEWABLE_ORDER_IDENTITY",
+    "navigation_or_acceptance": false,
+    "tail_claim_action": false,
+    "order_state": "ready_to_pack",
+    "item_name": "蓝铁装备原件",
+    "item_hover_verified": true,
+    "quantity_and_stock_same_item": true,
+    "quantity": 10,
+    "stock_quantity": 100,
+    "capacity": 200,
+    "item_volume": 20,
+    "stock_basis": "available_before_packing",
+    "packed_quantity": 10,
+    "already_published": false,
+    "paid_resources": false,
+    "control_enabled": true,
+    "existing_quote": false,
+    "quote_bound_to_cargo": true,
+    "control_text": "下一步",
+    "control_color": "white",
+    "yellow_start_transport_selected": false,
+    "supporting_evidence": {
+      "item_identity": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      }
+    },
+    "next_step_has_side_effect": true
+  },
+  "existing_quote": {
+    "schema": 1,
+    "game": "endfield",
+    "version": "v3.1.0",
+    "game_day": "REPLACE_WITH_GAME_DAY",
+    "supervised": false,
+    "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+    "evidence": {
+      "path": "evidence/REPLACE.png",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+    },
+    "window": {
+      "hwnd": 0,
+      "pid": 0,
+      "title": "明日方舟：终末地",
+      "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+      "client_size": [
+        1280,
+        720
+      ],
+      "foreground": true,
+      "scaled_evidence_confirmed": true
+    },
+    "framework": "v5.16.1",
+    "region": "valleyiv",
+    "node": "OriginiumSciencePark",
+    "node_name": "源石研究园",
+    "dialog_unambiguous": true,
+    "node_order_bound": true,
+    "order_reference": "REPLACE_WITH_REVIEWABLE_ORDER_IDENTITY",
+    "navigation_or_acceptance": false,
+    "tail_claim_action": false,
+    "order_state": "quoted_unpublished",
+    "item_name": "蓝铁装备原件",
+    "item_hover_verified": true,
+    "quantity_and_stock_same_item": true,
+    "quantity": 10,
+    "stock_quantity": 90,
+    "capacity": 200,
+    "item_volume": 20,
+    "stock_basis": "remaining_after_packing",
+    "packed_quantity": 10,
+    "already_published": false,
+    "paid_resources": false,
+    "control_enabled": true,
+    "existing_quote": true,
+    "quote_bound_to_cargo": true,
+    "control_text": "快速转交",
+    "control_color": "white",
+    "yellow_start_transport_selected": false,
+    "supporting_evidence": {
+      "item_identity": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      }
+    }
+  },
+  "published": {
+    "schema": 1,
+    "game": "endfield",
+    "version": "v3.1.0",
+    "game_day": "REPLACE_WITH_GAME_DAY",
+    "supervised": false,
+    "reviewed_at": "REPLACE_WITH_CURRENT_TIMEZONE_TIMESTAMP",
+    "evidence": {
+      "path": "evidence/REPLACE.png",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+    },
+    "window": {
+      "hwnd": 0,
+      "pid": 0,
+      "title": "明日方舟：终末地",
+      "executable": "REPLACE_WITH_ACTUAL_GAME_EXE",
+      "client_size": [
+        1280,
+        720
+      ],
+      "foreground": true,
+      "scaled_evidence_confirmed": true
+    },
+    "framework": "v5.16.1",
+    "region": "valleyiv",
+    "node": "OriginiumSciencePark",
+    "node_name": "源石研究园",
+    "dialog_unambiguous": true,
+    "node_order_bound": true,
+    "order_reference": "REPLACE_WITH_REVIEWABLE_ORDER_IDENTITY",
+    "navigation_or_acceptance": false,
+    "tail_claim_action": false,
+    "order_state": "posted_waiting",
+    "item_name": "蓝铁装备原件",
+    "item_hover_verified": true,
+    "quantity_and_stock_same_item": true,
+    "quantity": 10,
+    "stock_quantity": 90,
+    "capacity": 200,
+    "item_volume": 20,
+    "stock_basis": "remaining_after_packing",
+    "packed_quantity": 10,
+    "already_published": false,
+    "paid_resources": false,
+    "control_enabled": true,
+    "existing_quote": true,
+    "quote_bound_to_cargo": true,
+    "control_text": "快速转交",
+    "control_color": "white",
+    "yellow_start_transport_selected": false,
+    "supporting_evidence": {
+      "item_identity": {
+        "path": "evidence/REPLACE.png",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "captured_at": "REPLACE_WITH_CAPTURE_TIME"
+      }
+    },
+    "panel_title": "我转交的委托",
+    "publish_text": "已发布",
+    "acceptance_text": "等待接单中",
+    "tail_state": "pending_acceptance",
+    "tail_payment_received": false,
+    "deposit_observed": false,
+    "expiry_text": "合成：2天后过期"
+  }
+}

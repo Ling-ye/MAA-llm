@@ -307,6 +307,8 @@ def new_record(plan, review, run, cost):
         "tail_payment_scope":"observed claimable rewards only; not all orders settled" if plan["phase"]=="tail" else None}
 
 def execute(plan, review, api=request, root=ROOT):
+    if plan.get("phase") == "delivery" and plan.get("region") == "valleyiv":
+        raise ValueError("Valley delivery automatic submission is disabled; use endfield_valley_transfer.py supervision. Existing quotes must never be repacked.")
     execution_enabled()
     if plan != make_plan(plan["phase"],plan["region"],plan["unit"],plan["cycle"],plan["instance"],review):
         raise ValueError("Plan differs from canonical policy")
