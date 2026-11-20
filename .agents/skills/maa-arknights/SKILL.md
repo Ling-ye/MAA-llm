@@ -30,3 +30,5 @@ description: 在 Windows 上准备、执行、核验或恢复明日方舟 MAA �
 --status 只读。--resume <summary> 只接受当天绑定、已验证完成前缀后的纯 planned 后缀，同时要求 --execute 和新鲜主页证据。submitting/running/unknown、哈希变化或已存在执行产物一律停止，不删账解锁。STOP/超时只停止本次受控 worker，不泛杀 Python。
 
 不得为了测试技能启动游戏。该 v2 状态机和移植仅离线验证；不宣称三游戏全链路无人值守成功。
+
+锁屏时按 RUNBOOK 的“锁屏与分游戏就绪检查”执行：只用精确实例 ADB guest 证据，主页与阶段审核通过后才做日常。冷启动成功或标题画面不算就绪；不因宿主锁屏停止已可用的 ADB 路径，但不绕过任何其他门槛。少前 2/终末地仍需解锁桌面。
