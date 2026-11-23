@@ -1,20 +1,20 @@
 # MAA-llm
 
-面向 **Windows、人工或 LLM 监督**的三游戏日常自动化工作流。它将 MAA、MaaGF2Exilium、MaaEnd 的准备、任务计划、运行账本、证据核验和恢复入口组织成可阅读的脚本与三个独立技能。
+面向 **Windows + MuMu、人工或 LLM 监督**的三游戏日常自动化工作流。默认只走 MuMu；受支持的 PC 路径仅显式选作旧版兼容，不自动回退。它将 MAA、MaaGF2Exilium、MaaEnd 的准备、任务计划、运行账本、证据核验和恢复入口组织成可阅读的脚本与三个独立技能。
 
 **当前定位：固定版本的实验性集成。默认只预览，新副本禁止直接执行游戏。尚未验证三款游戏从冷启动到完成退出的全程无人值守链路。**
 
 本项目与游戏发行商及上游项目没有官方隶属关系；仓库不包含游戏、模拟器、第三方二进制、账号配置或运行数据。
 
-[开始使用](docs/GETTING_STARTED.md) · [运行说明](docs/RUNBOOK.md) · [支持与验证边界](docs/VALIDATION.md) · [中断恢复](docs/RECOVERY.md) · [安全与隐私](SECURITY.md)
+[开始使用](docs/GETTING_STARTED.md) · [MuMu 路由与固定清单](docs/MUMU-DAILY.md) · [运行说明](docs/RUNBOOK.md) · [支持与验证边界](docs/VALIDATION.md) · [中断恢复](docs/RECOVERY.md) · [安全与隐私](SECURITY.md)
 
 ## 可以做什么
 
 | 游戏 | 提供的入口 | 必须知道的限制 |
 | --- | --- | --- |
-| 明日方舟 | 基础日常、自然理智 TL-9；公招→基建→信用购买→领奖 | 只适配固定 MAA 版本；每次检查 TL-9 当期开放且可代理。不能直接把它当任意关卡刷图器 |
-| 少女前线 2 | 基础日常与突破准备；新增每日免费箱、班组、调度室、本期热寂悖论物资模式的监督账本 | 旧执行适配器固定 v2.8.4；新增 v2.8.6 入口仅做计划、证据与防重，没有自动点击后端。喝茶与最高可扫荡关卡仍需人工核验 |
-| 明日方舟：终末地 | 目标库存、单倍领取、核心奖励、环境监测、物资调度；谷地两折礼物、仓储装箱转交与尾款、信用与远程回收 | 固定 v3.1.0 / Framework v5.16.1、1280×720。谷地三仓使用独立监督转交账本，旧自动提交已停用。信用购买/刷新及其他新增封装仍待现场验收 |
+| 明日方舟 | MuMu ADB；基础奖励、公招、基建、信用购买、领奖 | 已验证过监督锁屏会话，不保证每次成功。TL-9 已结束，未授权替关时只跳过战斗，不自动换关 |
+| 少女前线 2 | 独立 MuMu，v2.8.6 监督 ADB；日活、突破、活动层、免费日箱/周箱、班组、派遣/调度、指定活动 | 已验证过监督 ADB；锁屏、无人值守未验收。旧 PC 入口固定 v2.8.4，不自动使用 |
+| 明日方舟：终末地 | 独立 MuMu 路线；核心、环境监测、物资调度、两折礼物、仓储转交/尾款、信用、两地回收分别验收 | Android 仅验证安装与启动画面，未验证登录后的执行。受审 Win32 PC 是独立旧路径 |
 
 具体范围以脚本、[运行说明](docs/RUNBOOK.md)和[终末地补充任务](docs/ENDFIELD-EXTRAS.md)为准。环境监测、物资调度、仓储转交分别记账；100 活跃不能替代所有阶段完成。
 
@@ -44,8 +44,9 @@ cd MAA-llm
 python --version
 python -m unittest discover -s tests -v
 python scripts/bootstrap.py init
-python scripts/runner.py
-python scripts/endfield_extras.py --status
+python scripts/mumu_daily.py plan --game arknights
+python scripts/mumu_daily.py plan --game gf2
+python scripts/mumu_daily.py status --game endfield
 ~~~
 
 以上命令只检查、预览或运行离线测试，不启动游戏。初始化本地配置：
@@ -104,7 +105,12 @@ python scripts/bootstrap.py download --game arknights
 
 本仓库以 **GNU AGPL v3** 发布，见 [LICENSE](LICENSE)。第三方派生配置和运行依赖的来源、版本与许可单独列于 [NOTICE.md](NOTICE.md)；其中 MaaGF2Exilium 使用 MIT，MaaFramework 使用 LGPL v3。游戏资源、名称与商标的权利不因本项目开源而转移。
 
-## 新增监督入口
+## 监督入口
+
+MuMu 使用 `scripts/mumu_daily.py`，先查计划与状态，再按 [MuMu 固定清单](docs/MUMU-DAILY.md) 和 [证据命令](docs/MUMU-EVIDENCE.md) 审核预约和结果；账本不执行游戏输入。
+
+以下为既有独立入口，不代表 MuMu 自动执行：
+
 
 少前2四组见 [商城、班组、调度室与本期活动](docs/GF2-SUPERVISED-DAILY.md)，谷地三仓见 [监督转交](docs/ENDFIELD-VALLEY-TRANSFER.md)。这些入口默认输出离线计划，--execute 明确拒绝；监督者实际操作前预约，之后凭新证据记账。不能把历史人工成功表述为脚本自动执行成功，也不能用空克隆重跑。
 

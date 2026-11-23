@@ -3,6 +3,7 @@
 import argparse,json,time,uuid
 
 from endfield_common import *
+from project_paths import add_native_transport_argument, require_native_pc
 
 from endfield_safe import state_success
 
@@ -153,11 +154,13 @@ def execute(plan,api=request,cargo_reviewed=False):
 
 def main():
 
- p=argparse.ArgumentParser();p.add_argument('--phase',choices=PHASES,required=True);p.add_argument('--instance');p.add_argument('--execute',action='store_true');p.add_argument('--cargo-reviewed',action='store_true');p.add_argument('--region',choices=['valleyiv','wuling']);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--phase',choices=PHASES,required=True);p.add_argument('--instance');p.add_argument('--execute',action='store_true');p.add_argument('--cargo-reviewed',action='store_true');p.add_argument('--region',choices=['valleyiv','wuling']);add_native_transport_argument(p);a=p.parse_args()
 
  try:
 
-  if a.execute:require_execution('endfield')
+  if a.execute:
+   require_native_pc('endfield',a.transport)
+   require_execution('endfield')
   plan=make_plan(a.phase,a.instance,a.region)
 
   if a.execute:result,code=execute(plan,cargo_reviewed=a.cargo_reviewed)

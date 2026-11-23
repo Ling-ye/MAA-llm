@@ -1,12 +1,14 @@
 # 运行说明
 
+默认路线请先读 [MuMu 三游戏固定清单](MUMU-DAILY.md) 和 [证据命令](MUMU-EVIDENCE.md)。下文说明已有阶段和审计；少前2与终末地的 Win32 命令是显式 PC 旧路径，MuMu 阻塞时不要运行。
+
 ## 通用准备
 
 在仓库根目录运行命令。新机先按 README 初始化 config.local 并确认软件路径、固定版本、执行授权起始游戏日。不要把 ready/enabled 当作一次性跳过现场核验的开关。三款游戏串行执行；不要同时启动两个工作副本。
 
 1. python scripts/daily_pipeline.py status 和 python scripts/daily_audit.py 只读现有记录。
 2. 核对当前游戏日与独立阶段 attempt。存在失败、未知或进行中的 attempt 时读恢复说明，不重新执行。
-3. python scripts/prepare_game.py --game <游戏> 预览；经授权加 --execute 才启动。
+3. 默认先跑 `python scripts/mumu_daily.py plan --game <游戏>`；该命令只读。明日方舟的另行授权启动仍用 prepare_game.py；少前2和终末地只有明确选择旧 PC 时才加 `--transport pc` 使用该启动器。
 4. 查看真实进程、窗口、登录和最新画面。没有首页、界面白屏、UAC 未完成都停止。新鲜截图保存在 scripts/evidence/，不提交。
 5. 每阶段串行执行、检查回调和实际结果、记录资源前后差异；全部要求完成后才清理。
 
@@ -14,7 +16,7 @@
 
 ## 明日方舟
 
-固定 MAA v6.22.0、官方服、明确的本地 MuMu 实例和 loopback ADB serial。自然理智只刷 TL-9；每次检查当期开放和代理可用，不自动换关。
+固定 MAA v6.22.0、官方服、明确的本地 MuMu 实例和 loopback ADB serial。TL-9 已关闭；战斗无另获指定授权时跳过，不自动换关、不耗理智，继续独立核验非战斗。下面历史战斗执行行仅说明原适配器门禁，不能执行已关闭的 TL-9。
 
 ~~~powershell
 python scripts/runner.py
@@ -32,7 +34,7 @@ v2 固定顺序：Recruit → Infrast(mode=0 全设施集合) → Mall → Award
 
 基础账本 state/arknights-<day>.json 与 operations attempt 分开保存。v2 记录全部 planned 阶段，先持久化 submitting/running，再启动受控 worker。成功必须同时满足 taskid、uuid、完整回调链、任务/配置/结果/事件哈希和 worker 收据。结尾 automation_completed_unverified 仍需实际奖励页验收。
 
-## 少女前线 2
+## 少女前线 2：显式 PC 旧路径
 
 三个适配器共享锁，但分别有基础、supplemental、breakthrough 防重放账本。它们固定 v2.8.4；安装为 v2.8.6，则只允许预览/审阅，不能通过改 VERSION 或重新下载覆盖安装来“适配”。
 
@@ -45,7 +47,7 @@ python scripts/gf2_breakthrough.py
 ~~~
 
 仅在版本相符、已获执行授权且当前画面审核通过时，添加：
---execute --hwnd <新鲜句柄> --screen-reviewed --screen-evidence scripts/evidence/<五分钟内当前页面>.png
+--transport pc --execute --hwnd <新鲜句柄> --screen-reviewed --screen-evidence scripts/evidence/<五分钟内当前页面>.png
 
 - 基础：PrepareDailyTasks / PublicAreaDailyTasks / ClaimRewardTasks；官方 agent 必须成功注册 scroll_end 并加载 base+resource_pc。旧版领奖分支可能失败，失败后保留原回执。
 - 补充：免费烹调及已有花浇水；没有花时返回，不播种、不拔除、不换种。**该补充脚本主动禁用喝茶支路**；喝茶仍由监督者检查当日免费次数并另行完成和记录，不能说脚本已经覆盖。
@@ -54,20 +56,20 @@ python scripts/gf2_breakthrough.py
 
 每日烹调、喝茶、浇花和最高突破材料扫荡分别核验，记录活跃/每日目标、最终奖励页和实际体力变化。不要用活动值替代这些独立要求。
 
-## 终末地
+## 终末地：显式 PC 旧路径
 
 固定 MaaEnd v3.1.0、MaaFramework v5.16.1、游戏客户端 1280×720 窗口。使用官方启动器；不直接执行游戏 EXE。Windows 安全桌面只由用户确认，之后检查 MaaEnd 实际进程及 /system/is-elevated 结果。
 
 已有白屏问题未解决时不进行后续步骤。默认 preview 不访问 MaaEnd API；实际运行前需确认资源哈希与受审基线相符。
 
 ~~~powershell
-python scripts/endfield_bootstrap.py --instance dot-safe-<本日标识>
-python scripts/endfield_bootstrap.py --instance dot-safe-<本日标识> --hwnd <新鲜句柄> --execute
-python scripts/endfield_safe.py --phase daily --instance dot-safe-<本日标识>
-python scripts/endfield_safe.py --phase daily --instance dot-safe-<本日标识> --execute
-python scripts/endfield_regional.py --phase environment-monitoring --instance dot-safe-<本日标识> --execute
-python scripts/endfield_stock.py --phase sell --instance dot-safe-<本日标识> --execute
-python scripts/endfield_stock.py --phase buy --instance dot-safe-<本日标识> --execute
+python scripts/endfield_bootstrap.py --transport pc --instance dot-safe-<本日标识>
+python scripts/endfield_bootstrap.py --transport pc --instance dot-safe-<本日标识> --hwnd <新鲜句柄> --execute
+python scripts/endfield_safe.py --transport pc --phase daily --instance dot-safe-<本日标识>
+python scripts/endfield_safe.py --transport pc --phase daily --instance dot-safe-<本日标识> --execute
+python scripts/endfield_regional.py --transport pc --phase environment-monitoring --instance dot-safe-<本日标识> --execute
+python scripts/endfield_stock.py --transport pc --phase sell --instance dot-safe-<本日标识> --execute
+python scripts/endfield_stock.py --transport pc --phase buy --instance dot-safe-<本日标识> --execute
 ~~~
 
 逐条执行并确认上一阶段已结束，不能把上述多条命令作为无监督批处理。
@@ -80,7 +82,7 @@ daily 包含好友访问、限定快速收菜、ProtocolSpace 目标库存和奖
 验证核心 100 活跃奖励可调用：
 
 ~~~powershell
-python scripts/endfield_safe.py --record-verification scripts/runs/<本次>/summary.json --evidence scripts/evidence/<实际奖励页>.png --activity 100
+python scripts/endfield_safe.py --transport pc --record-verification scripts/runs/<本次>/summary.json --evidence scripts/evidence/<实际奖励页>.png --activity 100
 ~~~
 
 这个命令记录监督者的视觉确认，不读取截图语义；只有完整 daily 阶段安全结束且当天版本匹配的运行可写 success；rewards 单独阶段不能认证目标库存已完成。环境/出售/购买仍单独记录 verified 与证据。
@@ -101,10 +103,10 @@ daily_pipeline prepared 对方舟还须 --stage-reviewed --stage-evidence <TL-9�
 ~~~powershell
 # 先预览并核对精确进程
 powershell -NoProfile -File scripts/finish-game.ps1 -Game arknights -Receipt scripts/runs/<v2运行>/summary.json -Python <本机Python路径>
-# 确认后加 -Execute；少前 2 使用 -Game gf2 与实际日常总结
+# 确认后加 -Execute；旧 PC 少前 2 使用 -Game gf2 -Transport pc 与实际日常总结
 ~~~
 
-终末地先经完整范围审计，再用 endfield_close.py --receipt <summary> --execute 提交原生关闭任务，确认 Endfield 进程已退出后，用 finish-game.ps1 -Game endfield 关闭对应 MaaEnd。
+仅终末地旧 PC 路径先经完整范围审计，再用 endfield_close.py --transport pc --receipt <summary> --execute 提交原生关闭任务，确认 Endfield 进程已退出后，用 finish-game.ps1 -Game endfield -Transport pc 关闭对应 MaaEnd。
 
 清理回执写在 scripts/cleanup-<game>.json，供协调器链接。全过程保持 partial/unknown 与实际未完成项；关闭动作不等于日常完成。模拟器不由这个脚本自动关闭。
 
@@ -114,7 +116,7 @@ powershell -NoProfile -File scripts/finish-game.ps1 -Game arknights -Receipt scr
 
 少前2新增四组按 [监督入口](GF2-SUPERVISED-DAILY.md) 分别处理：每日免费补给箱、班组补给/要务、调度领取/原队重派/逐周档、本期活动专用密钥物资模式。v2.8.6 的新入口没有自动点击后端，旧 v2.8.4 版本保护和禁购项不变。
 
-谷地三仓按 [监督转交](ENDFIELD-VALLEY-TRANSFER.md) 处理，旧 endfield_extras.py --phase delivery --region valleyiv 的自动提交已拒绝；已有报价复用，下一步先预约，待接单与尾款到账分开。武陵、物资调度及信用范围不变。收尾额外检查两个新增审计，不伪造旧综合审计成功。
+谷地三仓按 [监督转交](ENDFIELD-VALLEY-TRANSFER.md) 处理，旧 endfield_extras.py --phase delivery --region valleyiv 的旧 PC 自动提交已拒绝；已有报价复用，下一步先预约，待接单与尾款到账分开。武陵、物资调度及信用范围不变。收尾额外检查两个新增审计，不伪造旧综合审计成功。
 
 ## 锁屏与分游戏就绪检查
 
@@ -124,6 +126,6 @@ Windows 锁屏不作为明日方舟的统一否决条件。仅官方服 MuMu 的
 - 核对实例实际 ADB host/port 与配置的 loopback serial 完全一致，再检查 get-state=device、官方包存在、通过二进制 exec-out screencap -p 得到新鲜可解码 guest PNG。不得改选其他在线设备。
 - 监督者须实际看到已登录主页；标题页、加载页、黑白屏、卡死、缺失/过期画面或身份不明都不能开始消费型日常。静态主页可能正常，不能仅因两个 PNG 哈希相同就断言卡死；结合加载进展、响应及观察时间判断，无法判断则停止。
 - 锁屏时 TL-9 审核与 v2 主页证据也必须来自 guest；PNG 格式、窗口/进程存在或 MAA 回调不代替视觉验收。
-- 少前 2 与终末地仍必须有可交互且确认未锁定的桌面；锁屏或桌面状态未知时拒绝启动前台任务，不尝试后台点击。
+- 少前 2 与终末地的显式旧 Win32 路径仍须实时验证桌面和前台窗口；其默认 MuMu 路径用新鲜 guest 证据，不自动回退 PC。少前 2 的 MuMu ADB 有监督实测，但真实 Windows 锁屏未验收；终末地 MuMu 登录后的任务尚未验收。
 
 `scripts/session_readiness.py` 是无 I/O 的监督决策函数，调用方传入独立实时观察；不是系统探针，不会启动、点击、截图或自动验收，也没有替代现有执行入口的门禁。它按游戏返回缺少的条件，仅所有条件通过后才能继续原阶段审核。离线测试不证明锁屏下整套日常已实测成功。

@@ -81,9 +81,22 @@ class PortableSafetyTests(unittest.TestCase):
  def test_endfield_cli_gates_before_plan_or_api(self):
   import endfield_regional as regional,endfield_stock as stock
   for module,phase in ((regional,'environment-monitoring'),(stock,'sell')):
-   with self.subTest(module=module.__name__),patch.object(sys,'argv',['adapter','--phase',phase,'--execute']),patch.object(module,'require_execution',side_effect=RuntimeError('disabled')) as gate,patch.object(module,'make_plan',side_effect=AssertionError('plan reached')),contextlib.redirect_stdout(io.StringIO()):
+   with self.subTest(module=module.__name__),patch.object(sys,'argv',['adapter','--phase',phase,'--execute','--transport','pc']),patch.object(module,'require_execution',side_effect=RuntimeError('disabled')) as gate,patch.object(module,'make_plan',side_effect=AssertionError('plan reached')),contextlib.redirect_stdout(io.StringIO()):
     self.assertEqual(module.main(),2);gate.assert_called_once_with('endfield')
 
+ def test_direct_native_cli_execution_requires_pc(self):
+  import endfield_safe,endfield_bootstrap,endfield_close,endfield_stock,endfield_extras
+  modules = (
+    (gf2_safe, ['--execute']), (gf2_supplemental, ['--check-agent']), (gf2_breakthrough, ['--execute']),
+    (endfield_safe, ['--execute']), (endfield_bootstrap, ['--execute']),
+    (endfield_close, ['--receipt','unused.json','--execute']),
+    (endfield_regional, ['--phase','environment-monitoring','--execute']),
+    (endfield_stock, ['--phase','sell','--execute']), (endfield_extras, ['--execute']),
+  )
+  for module,args in modules:
+   with self.subTest(module=module.__name__),patch.object(sys,'argv',['adapter',*args]),contextlib.redirect_stdout(io.StringIO()) as out:
+    self.assertNotEqual(module.main(),0)
+    self.assertIn('mumu_daily.py',out.getvalue())
  def test_scanner_accepts_text_license(self):
   p=self.root/'LICENSE';p.write_text('GNU AFFERO GENERAL PUBLIC LICENSE\nVersion 3, 19 November 2007\n')
   result=check_repository.inspect([p],self.root)

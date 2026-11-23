@@ -3,6 +3,7 @@
 import argparse,json,time,uuid,re,copy
 
 from endfield_common import *
+from project_paths import add_native_transport_argument, require_native_pc
 
 from endfield_safe import state_success
 
@@ -188,11 +189,13 @@ def execute(plan,api=request,recover_pretrade=None):
 
 def main():
 
- p=argparse.ArgumentParser();p.add_argument('--phase',choices=PHASES,required=True);p.add_argument('--instance');p.add_argument('--execute',action='store_true');p.add_argument('--recover-pretrade-parse-failure',type=Path);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--phase',choices=PHASES,required=True);p.add_argument('--instance');p.add_argument('--execute',action='store_true');p.add_argument('--recover-pretrade-parse-failure',type=Path);add_native_transport_argument(p);a=p.parse_args()
 
  try:
 
-  if a.execute:require_execution('endfield')
+  if a.execute:
+   require_native_pc('endfield',a.transport)
+   require_execution('endfield')
   plan=make_plan(a.phase,a.instance)
 
   if a.recover_pretrade_parse_failure and not a.execute:plan['recovery_preview']=recovery_guard(a.recover_pretrade_parse_failure,plan)[1]

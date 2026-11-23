@@ -2,6 +2,7 @@
 import argparse,json,time
 from pathlib import Path
 from endfield_common import *
+from project_paths import add_native_transport_argument, require_native_pc
 ATTACH={'CloseLauncher':False,'ApplyGameSetting':True,'GameSettingRegion':'CN','GameSettingDisplayType':'Window','ResolutionWidth':1280,'ResolutionHeight':720,'GameSettingLanguage':'Unchanged','GraphicsQuality':-1,'FrameRate':-1,'AutoHDR':'Unchanged'}
 def close(receipt,api=request):
  check_stop();manifest=local_versions();r=validate_receipt(receipt);instance=r['instance']
@@ -27,9 +28,11 @@ def close(receipt,api=request):
   atomic_json(path,result);return result
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--receipt',type=Path,required=True);p.add_argument('--execute',action='store_true');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--receipt',type=Path,required=True);p.add_argument('--execute',action='store_true');add_native_transport_argument(p);a=p.parse_args()
  try:
-  if a.execute:require_execution('endfield')
+  if a.execute:
+   require_native_pc('endfield',a.transport)
+   require_execution('endfield')
   if a.execute:r=close(a.receipt)
   else:
    receipt=validate_receipt(a.receipt);r={'mode':'plan_only','instance':receipt['instance'],'CloseGamePC':ATTACH}

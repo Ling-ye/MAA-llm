@@ -1,7 +1,7 @@
 """Bounded startup; a request is never treated as login or UAC approval."""
 import argparse, json, os, subprocess, time
 from pathlib import Path
-from project_paths import configured_path, config_path, install_path, require_execution
+from project_paths import configured_path, config_path, install_path, require_execution, select_transport, supervised_mumu_handoff, add_native_transport_argument, is_loopback_adb_serial
 from runner import read_json, load_config, preflight, call, screenshot, game_day, exclusive_lock
 ROOT = Path(__file__).resolve().parent
 
@@ -13,10 +13,14 @@ def processes():
     return result if isinstance(result, list) else [result]
 
 def targets(game):
+    if game not in ('gf2', 'endfield'): raise ValueError('No Windows client for this game')
     if game == 'gf2': return [('GF2_Exilium.exe', configured_path('gf2_game'))]
     return [('Games.exe', configured_path('endfield_launcher')), ('MaaEnd.exe', install_path('endfield')/'MaaEnd.exe')]
 
-def prepare(game):
+def prepare(game, transport='mumu'):
+    transport = select_transport(game, transport)
+    if transport == 'mumu' and game != 'arknights':
+        raise ValueError(supervised_mumu_handoff(game))
     require_execution(game)
     if (ROOT/'STOP').exists(): raise RuntimeError('STOP exists')
     journal = ROOT/'state'/('daily-'+game_day()+'.json')
@@ -24,11 +28,14 @@ def prepare(game):
         return {'game':game, 'status':'already_closed_today', 'launched':False}
     with exclusive_lock(ROOT/'state'/'pipeline.lock'):
         if game == 'arknights':
-            c = load_config(config_path('arknights.json')); preflight(c, True)
+            c = load_config(config_path('arknights.json'))
+            if not is_loopback_adb_serial(c.get('serial')):
+                raise ValueError('Only an explicit configured loopback ADB serial is allowed')
+            preflight(c, True)
             call([c['adb_path'], '-s', c['serial'], 'shell', 'monkey', '-p', 'com.hypergryph.arknights', '-c', 'android.intent.category.LAUNCHER', '1'], 20)
             time.sleep(5); (ROOT/'evidence').mkdir(exist_ok=True)
             screenshot(c, ROOT/'evidence'/'arknights-prepare.png')
-            return {'game':game, 'status':'awaiting_home_review', 'tasks_executed':False}
+            return {'game':game, 'status':'awaiting_home_review', 'transport':transport, 'tasks_executed':False}
         expected = targets(game); existing = processes(); requests = []
         for name, path in expected:
             if not path.is_file(): raise FileNotFoundError(path)
@@ -55,8 +62,15 @@ def prepare(game):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--game', choices=['arknights','gf2','endfield'], required=True); p.add_argument('--execute', action='store_true'); a=p.parse_args(argv)
-    result = prepare(a.game) if a.execute else {'mode':'plan', 'game':a.game, 'requires':'local paths, authorized execution, fresh login/window review'}
+    p.add_argument('--game', choices=['arknights','gf2','endfield'], required=True); p.add_argument('--execute', action='store_true'); add_native_transport_argument(p); a=p.parse_args(argv)
+    transport = select_transport(a.game, a.transport)
+    if a.execute:
+        result = prepare(a.game, transport)
+    else:
+        result = {'mode':'plan', 'game':a.game, 'transport':transport,
+                  'requires':'local paths, authorized execution, fresh login/window review'}
+        if transport == 'mumu' and a.game != 'arknights':
+            result['handoff'] = supervised_mumu_handoff(a.game)
     print(json.dumps(result, ensure_ascii=False)); return 0
 if __name__ == '__main__':
     try: raise SystemExit(main())

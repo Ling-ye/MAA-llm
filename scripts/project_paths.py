@@ -2,6 +2,7 @@
 from pathlib import Path
 import datetime as dt
 import json
+import re
 
 PROJECT = Path(__file__).resolve().parents[1]
 POLICIES = PROJECT / 'policies'
@@ -27,6 +28,35 @@ def configured_path(key):
     if not value:
         raise RuntimeError('Set paths.' + key + ' in config.local/runtime.json')
     return resolve_user_path(value)
+
+def select_transport(game, transport='mumu'):
+    if game not in VERSIONS:
+        raise ValueError('Unknown game')
+    if transport not in ('mumu', 'pc'):
+        raise ValueError('Unknown transport')
+    if game == 'arknights' and transport != 'mumu':
+        raise ValueError('Arknights supports only the MuMu transport')
+    return transport
+
+
+def is_loopback_adb_serial(serial):
+    match = re.fullmatch(r'127\.0\.0\.1:([0-9]{1,5})', serial) if isinstance(serial, str) else None
+    return bool(match and 1 <= int(match[1]) <= 65535)
+
+
+def supervised_mumu_handoff(game):
+    return f'{game} on MuMu requires supervised guest steps: python scripts/mumu_daily.py plan --game {game}; no Windows client or native adapter was started'
+
+
+def add_native_transport_argument(parser):
+    parser.add_argument('--transport', choices=('mumu', 'pc'), default='mumu',
+                        help='PC adapters require explicit --transport pc for execution; default is MuMu')
+
+
+def require_native_pc(game, transport='mumu'):
+    if select_transport(game, transport) != 'pc':
+        raise ValueError(supervised_mumu_handoff(game) + '; use --transport pc only when specifically opting in to the Windows route')
+
 
 def require_execution(game):
     """New checkouts cannot replay an already-used game day by default."""

@@ -3,7 +3,7 @@
 | 你想做什么 | 阅读顺序 |
 | --- | --- |
 | 第一次使用 | [项目介绍](../README.md) → [开始使用](GETTING_STARTED.md) → [验证边界](VALIDATION.md) |
-| 运行已授权日常 | [运行说明](RUNBOOK.md) → 对应 .agents/skills/ 下的技能 |
+| 运行已授权日常 | [MuMu 清单](MUMU-DAILY.md) → [证据命令](MUMU-EVIDENCE.md) → [运行说明](RUNBOOK.md) → 对应 .agents/skills/ 下的技能 |
 | 使用终末地补充任务 | [终末地礼物、转交、信用与回收](ENDFIELD-EXTRAS.md) |
 | 处理失败或结果未知 | [中断与恢复](RECOVERY.md)，先保留账本 |
 | 检查隐私与误操作风险 | [SECURITY.md](../SECURITY.md) |

@@ -1,0 +1,7 @@
+{
+  "emulators": {
+    "arknights": {"enabled": false, "vm_index": null, "serial": ""},
+    "gf2": {"enabled": false, "vm_index": null, "serial": ""},
+    "endfield": {"enabled": false, "vm_index": null, "serial": ""}
+  }
+}

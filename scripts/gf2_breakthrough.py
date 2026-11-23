@@ -3,7 +3,7 @@ Exit: 0 plan/agent probe; 1 failed; 2 blocked; 3 tasks completed, manual daily v
 """
 import argparse,ctypes,datetime,json,os,struct,subprocess,time,uuid,zlib
 from pathlib import Path
-from project_paths import install_path, POLICIES, require_execution
+from project_paths import install_path, POLICIES, require_execution, add_native_transport_argument, require_native_pc
 from policy_integrity import read_policy
 BASE=install_path('gf2')
 ROOT=Path(__file__).resolve().parent
@@ -152,9 +152,10 @@ def execute(base,root,hwnd=None,probe=False):
   lock.close()
 
 def main(argv=None):
- p=argparse.ArgumentParser();g=p.add_mutually_exclusive_group();g.add_argument('--execute',action='store_true');g.add_argument('--check-agent',action='store_true');p.add_argument('--hwnd',type=int);p.add_argument('--screen-reviewed',action='store_true');p.add_argument('--screen-evidence');a=p.parse_args(argv)
+ p=argparse.ArgumentParser();g=p.add_mutually_exclusive_group();g.add_argument('--execute',action='store_true');g.add_argument('--check-agent',action='store_true');p.add_argument('--hwnd',type=int);p.add_argument('--screen-reviewed',action='store_true');p.add_argument('--screen-evidence');add_native_transport_argument(p);a=p.parse_args(argv)
  if not a.execute and not a.check_agent:print(json.dumps(plan(),ensure_ascii=False));return 0
  try:
+  require_native_pc('gf2',a.transport)
   require_execution('gf2')
   if a.execute:
    if not a.screen_reviewed:raise Blocked('Current screen review required')

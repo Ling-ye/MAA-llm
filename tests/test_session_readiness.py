@@ -12,13 +12,16 @@ class SessionReadinessTests(unittest.TestCase):
 
     def test_ark_uses_guest_not_host_desktop(self):
         for desktop in ("locked", "unknown", "unlocked"):
-            with self.subTest(desktop=desktop):
-                self.assertTrue(assess("arknights", desktop, **self.observations())["ready_for_stage_review"])
+            for game in ("arknights", "gf2", "endfield"):
+                with self.subTest(desktop=desktop, game=game):
+                    result = assess(game, desktop, **(self.observations() | {"current_window_verified": False}))
+                    self.assertEqual(result["transport"], "mumu")
+                    self.assertTrue(result["ready_for_stage_review"])
 
     def test_native_games_fail_closed(self):
         for game in ("gf2", "endfield"):
             for desktop in ("locked", "unknown", "unlocked"):
-                self.assertEqual(assess(game, desktop, **self.observations())["ready_for_stage_review"], desktop == "unlocked")
+                self.assertEqual(assess(game, desktop, transport="pc", **self.observations())["ready_for_stage_review"], desktop == "unlocked")
 
     def test_every_required_observation_is_explicit(self):
         for key in self.observations():
@@ -54,3 +57,12 @@ class SessionReadinessTests(unittest.TestCase):
     def test_invalid_game_or_state(self):
         with self.assertRaises(ValueError): assess("other")
         with self.assertRaises(ValueError): assess("arknights", "other")
+
+    def test_transport_does_not_fall_back(self):
+        with self.assertRaises(ValueError):
+            assess("arknights", "unlocked", transport="pc", **self.observations())
+        with self.assertRaises(ValueError):
+            assess("gf2", "unlocked", transport="auto", **self.observations())
+        data = self.observations() | {"expected_serial": None, "actual_serial": None}
+        self.assertFalse(assess("gf2", "unlocked", **data)["ready_for_stage_review"])
+        self.assertTrue(assess("gf2", "unlocked", transport="pc", **data)["ready_for_stage_review"])

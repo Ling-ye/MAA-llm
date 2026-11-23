@@ -2,6 +2,7 @@
 import argparse,ctypes,json,time
 from pathlib import Path
 from endfield_common import *
+from project_paths import add_native_transport_argument, require_native_pc
 
 def window_check(hwnd):
  if not isinstance(hwnd,int) or hwnd<=0:raise ValueError('Explicit positive game HWND required')
@@ -40,9 +41,11 @@ def prepare(instance,hwnd,api=request,check_window=window_check):
   atomic_json(record,result);return result
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--execute',action='store_true');p.add_argument('--instance');p.add_argument('--hwnd',type=int);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--execute',action='store_true');p.add_argument('--instance');p.add_argument('--hwnd',type=int);add_native_transport_argument(p);a=p.parse_args()
  try:
-  if a.execute:require_execution('endfield')
+  if a.execute:
+   require_native_pc('endfield',a.transport)
+   require_execution('endfield')
   if not a.execute:r={'mode':'plan_only','instance':instance_id(a.instance),'requires':['already running MaaEnd localhost12701','user-authorized elevated session','Endfield logged in','actual1280x720window','explicit verified HWND'],'changes':['isolated runtime only'],'does_not':['launch or elevate software','accept agreements','login','start daily','edit GUI profiles']}
   else:r=prepare(a.instance,a.hwnd)
   print(json.dumps(r,ensure_ascii=False));return 0

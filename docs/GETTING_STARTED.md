@@ -2,13 +2,13 @@
 
 ## 1. 确认适用范围
 
-本项目目前针对 Windows 本机流程。需要 Python 3.12、PowerShell、Git，以及自行安装并登录的游戏客户端。明日方舟流程依赖明确的本地 MuMu 实例和 loopback ADB；少前 2、终末地使用受审的桌面窗口条件。不同语言、服务器、分辨率、资源版本和模拟器布局均可能需要重新适配。
+本项目面向 Windows 本机、MuMu 优先的监督工作流。需要 Python 3.12、PowerShell、Git；游戏及对应官方 Android 客户端由用户自行安装并完成登录。为各游戏配置独立的 MuMu 实例及精确 loopback ADB，串行运行。MuMu 阻塞就停止对应游戏；不要自动回退 PC。
 
-| 游戏 | 固定上游版本 | 执行方式 |
+| 游戏 | 上游版本与方式 | 验证范围 |
 | --- | --- | --- |
-| 明日方舟 | MAA v6.22.0 | 本机 MAA DLL / ADB |
-| 少女前线 2 | MaaGF2Exilium v2.8.4 | release 自带 Python / SDK；其他版本禁止直接执行 |
-| 终末地 | MaaEnd v3.1.0、MaaFramework v5.16.1 | 本机 MaaEnd API；1280×720 窗口 |
+| 明日方舟 | MAA v6.22.0 / MuMu ADB | 已有监督锁屏实测，后续必须逐次核验 |
+| 少女前线 2 | MaaGF2Exilium v2.8.6 / 官服 MuMu ADB | 已有监督实测，未验收锁屏；旧 PC 为独立 v2.8.4 |
+| 终末地 | MuMu 默认，MaaEnd v3.1.0 / Framework v5.16.1 的 Win32 为独立旧路径 | MuMu 目前仅能证明安装与启动，不证明登录后日常 |
 
 这些是已审阅的固定版本，不是“当前最新版”推荐。不要将最新版资源混入固定版本目录。先查看 [验证边界](VALIDATION.md)。
 
@@ -35,12 +35,14 @@ python scripts/bootstrap.py init --execute
 config.local/runtime.json 中：
 
 - installations.arknights / gf2 / endfield：已有上游安装目录；留空时使用仓库 tools/<game>/<固定版本>。
-- paths.gf2_game：少前 2 游戏可执行文件。
-- paths.endfield_launcher / endfield_game：终末地官方启动器与实际游戏可执行文件，用于启动和精确进程核验。
+- paths.gf2_game：仅给明确选择了旧 PC 路径的人填写少前 2 游戏可执行文件。
+- paths.endfield_launcher / endfield_game：仅给明确选择了旧 PC 路径的人填写终末地官方启动器与游戏可执行文件。
 - execution.<游戏>.enabled：初始为 false。
 - execution.<游戏>.not_before_game_day：允许开始的游戏日 YYYY-MM-DD。
 
-路径由你填写，可以使用相对仓库根目录的路径。明日方舟还需在两个配置中填写 maa_dir、adb_path、mumu_cli、serial、vm_index；不要复制别人的 ADB serial 或进程信息。只有首页和配置已经核验时才能设置 ready=true。
+`config.local/mumu-supervised.json` 要逐游戏核对并填写专用实例的 `vm_index`、`serial`，完成当前绑定审核后才将对应 `enabled` 设为 `true`。样例默认关闭，不包含可直接使用的设备地址。此开关不替代 `runtime.json` 的执行授权。
+
+路径由你填写，可以使用相对仓库根目录的路径。明日方舟旧执行脚本还需在两个配置中填写 maa_dir、adb_path、mumu_cli、serial、vm_index；不要复制别人的 ADB serial 或进程信息。只有首页和配置已经核验时才能设置 ready=true。
 
 ## 4. 准备上游软件
 
@@ -59,18 +61,15 @@ python scripts/bootstrap.py download --game arknights --execute
 ## 5. 先预览，再逐阶段运行
 
 ~~~powershell
-python scripts/daily_pipeline.py status
-python scripts/daily_audit.py
-python scripts/prepare_game.py --game arknights
-python scripts/ark_operations_v2.py
-python scripts/gf2_safe.py
-python scripts/endfield_safe.py --phase daily
-python scripts/endfield_extras.py --status
+python scripts/mumu_daily.py plan --game arknights
+python scripts/mumu_daily.py plan --game gf2
+python scripts/mumu_daily.py plan --game endfield
+python scripts/mumu_daily.py status --game gf2
 ~~~
 
 初次使用没有记录，审计显示待检查属于正常状态；它不会自动把任务标成成功。运行开关仍保持关闭，直到你已核对旧目录记录、选择一个尚未执行的游戏日，并明确授权具体阶段。
 
-需要执行时，仅启用相应游戏，设置真实起始游戏日，遵循 [RUNBOOK.md](RUNBOOK.md) 的版本、主页/关卡、截图和 --execute 前提。不要把文档中多条执行命令合成无监督批处理。
+需要执行时，仅启用相应游戏，设置真实起始游戏日，遵循 [MuMu 固定清单](MUMU-DAILY.md) 和 [证据命令](MUMU-EVIDENCE.md) 的版本、账号、主页、阶段、截图和账本门槛。既有 PC 命令另见 [RUNBOOK.md](RUNBOOK.md)，仅显式旧版兼容，不可当作 MuMu 回退。不要把多条命令合成无监督批处理。
 
 技能位于 .agents/skills/。可让支持本地文件的助手读取对应 SKILL.md；助手的权限、模型配置和截图隐私由你单独管理。无需将配置或运行证据上传至此 GitHub 仓库。
 

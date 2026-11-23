@@ -6,7 +6,7 @@ import argparse,datetime as dt,json,os,subprocess,sys,time,uuid
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT))
-from project_paths import config_path, install_path, require_execution
+from project_paths import config_path, install_path, require_execution, select_transport, supervised_mumu_handoff, add_native_transport_argument
 from runner import atomic_json,exclusive_lock,game_day,now,read_json
 GAMES=('arknights','gf2','endfield')
 PHASES=('pending','prepared','running','awaiting_verification','verified','closed','blocked')
@@ -54,16 +54,21 @@ def process_alive(pid):
   raise RuntimeError('Cannot verify worker exit; fail closed')
  try:return k.WaitForSingleObject(h,0)==258
  finally:k.CloseHandle(h)
-def next_action(state):
+def next_action(state, transport="mumu"):
  game=next_game(state)
  if game is None:
   from daily_audit import audited_next
   return audited_next(state,ROOT)[0]
  item=state['games'][game];phase=item['phase']
+ if game != 'arknights' and transport == 'mumu' and phase == 'prepared':
+  return {'game':game,'phase':phase,'transport':transport,'action':'inspect_existing_preparation_do_not_switch_transport'}
+ if game != 'arknights' and transport == 'mumu' and phase == 'pending':
+  return {'game':game,'phase':phase,'transport':transport,'action':'use_supervised_mumu_journal','handoff':supervised_mumu_handoff(game)}
  return {'game':game,'phase':phase,'action':{'pending':'prepare_and_inspect_login','prepared':'run_authorized_adapter','running':'inspect_existing_pid_and_receipt_do_not_restart','awaiting_verification':'inspect_live_rewards_and_save_verified_receipt','verified':'close_game_and_corresponding_maa_then_verify_process_absence','blocked':'report_blocker_do_not_retry'}[phase]}
 
-def command(game,hwnd=None,instance=None,stage_evidence=None,screen_evidence=None):
- if game not in GAMES:raise ValueError('Unknown game')
+def command(game,hwnd=None,instance=None,stage_evidence=None,screen_evidence=None,transport='mumu'):
+ transport=select_transport(game,transport)
+ if game!='arknights' and transport=='mumu':raise ValueError(supervised_mumu_handoff(game))
  py=sys.executable
  if game=='arknights':
   if not stage_evidence:raise ValueError('Current TL-9 review evidence required')
@@ -71,16 +76,17 @@ def command(game,hwnd=None,instance=None,stage_evidence=None,screen_evidence=Non
  if game=='gf2':
   if not hwnd or hwnd<=0:raise ValueError('GF2 requires freshly verified HWND')
   if not screen_evidence:raise ValueError('Current GF2 screen review evidence required')
-  return [str(install_path('gf2')/'python'/'python.exe'),str(ROOT/'gf2_safe.py'),'--execute','--hwnd',str(hwnd),'--screen-reviewed','--screen-evidence',str(screen_evidence)]
+  return [str(install_path('gf2')/'python'/'python.exe'),str(ROOT/'gf2_safe.py'),'--transport','pc','--execute','--hwnd',str(hwnd),'--screen-reviewed','--screen-evidence',str(screen_evidence)]
  if not instance:raise ValueError('Endfield requires runtime ID returned by bootstrap')
- return [py,str(ROOT/'endfield_safe.py'),'--execute','--phase','daily','--instance',instance]
+ return [py,str(ROOT/'endfield_safe.py'),'--transport','pc','--execute','--phase','daily','--instance',instance]
 
 def main(argv=None):
- p=argparse.ArgumentParser();p.add_argument('action',choices=['plan','status','init','prepared','run','collect','verified','closed','blocked']);p.add_argument('--game',choices=GAMES);p.add_argument('--execute',action='store_true');p.add_argument('--evidence',type=Path);p.add_argument('--receipt',type=Path);p.add_argument('--hwnd',type=int);p.add_argument('--instance');p.add_argument('--reason');p.add_argument('--stage-reviewed',action='store_true');p.add_argument('--stage-evidence',type=Path);a=p.parse_args(argv)
+ p=argparse.ArgumentParser();p.add_argument('action',choices=['plan','status','init','prepared','run','collect','verified','closed','blocked']);p.add_argument('--game',choices=GAMES);p.add_argument('--execute',action='store_true');p.add_argument('--evidence',type=Path);p.add_argument('--receipt',type=Path);p.add_argument('--hwnd',type=int);p.add_argument('--instance');p.add_argument('--reason');p.add_argument('--stage-reviewed',action='store_true');p.add_argument('--stage-evidence',type=Path);add_native_transport_argument(p);a=p.parse_args(argv)
+ if a.game:select_transport(a.game,a.transport)
  day=game_day();path=ROOT/'state'/('daily-'+day+'.json');state=read_json(path) if path.exists() else new_state(day)
  if a.action in ('plan','status'):
   from daily_audit import audit
-  print(json.dumps({'state':state,'next':next_action(state),'coverage_audit':audit(day,ROOT,state)},ensure_ascii=False,indent=2));return 0
+  print(json.dumps({'state':state,'next':next_action(state,a.transport),'coverage_audit':audit(day,ROOT,state)},ensure_ascii=False,indent=2));return 0
  if not a.execute:raise ValueError('Mutation/launch requires --execute; plan is read-only')
  if (ROOT/'STOP').exists():raise RuntimeError('STOP exists; no changes or launches')
  with exclusive_lock(ROOT/'state'/'orchestrator.lock'):
@@ -88,21 +94,26 @@ def main(argv=None):
   if a.action=='init':atomic_json(path,state);return 0
   game=a.game or next_game(state)
   if not game:raise ValueError('Day already closed; no replay')
+  transport=select_transport(game,a.transport)
+  if a.action in ('prepared','run') and game!='arknights' and transport=='mumu':
+   raise ValueError(supervised_mumu_handoff(game))
   item=state['games'][game]
   if a.action=='prepared':
    ev=validate_evidence(a.evidence)
-   if time.time()-Path(ev).stat().st_mtime>300:raise ValueError('Home screenshot stale')
+   if not 0<=time.time()-Path(ev).stat().st_mtime<=300:raise ValueError('Home screenshot stale')
    stage_evidence=None
    if game=='arknights':
     if not a.stage_reviewed:raise ValueError('Current TL-9 review required')
     stage_evidence=validate_evidence(a.stage_evidence)
     if not 0<=time.time()-Path(stage_evidence).stat().st_mtime<=300:raise ValueError('Stage screenshot stale')
-   transition(state,game,'prepared',{'home_evidence':ev,'stage_evidence':stage_evidence,'hwnd':a.hwnd,'instance':a.instance,'prepared_at_epoch':time.time()})
+   transition(state,game,'prepared',{'home_evidence':ev,'stage_evidence':stage_evidence,'hwnd':a.hwnd,'instance':a.instance,'prepared_at_epoch':time.time(),'transport':transport})
   elif a.action=='run':
    if item['phase']!='prepared':raise ValueError('Home/login verification required')
-   if time.time()-item['prepared_at_epoch']>300:raise ValueError('Home verification stale; inspect instead of launch')
+   if not 0<=time.time()-item['prepared_at_epoch']<=300:raise ValueError('Home verification stale; inspect instead of launch')
+   if item.get('transport', 'mumu' if game=='arknights' else None)!=transport:
+    raise ValueError('Prepared transport missing or does not match; review the existing journal, do not replay')
    require_execution(game)
-   cmd=command(game,item.get('hwnd'),item.get('instance'),item.get('stage_evidence'),item.get('home_evidence'))
+   cmd=command(game,item.get('hwnd'),item.get('instance'),item.get('stage_evidence'),item.get('home_evidence'),transport=transport)
    directory=ROOT/'runs'/('coordinator-'+day+'-'+game);directory.mkdir(parents=True,exist_ok=True)
    transition(state,game,'started',{'command':cmd,'directory':str(directory),'started_epoch':time.time()});atomic_json(path,state)
    try:
@@ -129,7 +140,7 @@ def main(argv=None):
    if rp.stat().st_mtime<item.get('started_epoch',0):raise ValueError('Cleanup receipt stale')
    transition(state,game,'closed',{'cleanup_receipt':str(rp)})
   elif a.action=='blocked':transition(state,game,'blocked',{'reason':a.reason or 'Manual inspection needed'})
-  atomic_json(path,state);print(json.dumps(next_action(state),ensure_ascii=False));return 0
+  atomic_json(path,state);print(json.dumps(next_action(state,a.transport),ensure_ascii=False));return 0
 if __name__=='__main__':
  try:raise SystemExit(main())
  except Exception as e:print(str(e),file=sys.stderr);raise SystemExit(2)

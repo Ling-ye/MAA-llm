@@ -413,13 +413,17 @@ def verify(summary, outcome, png, root=ROOT):
         return r
 
 def main(argv=None):
+    from project_paths import add_native_transport_argument, require_native_pc
     p=argparse.ArgumentParser()
+    add_native_transport_argument(p)
     p.add_argument("--phase",choices=PHASES);p.add_argument("--region",choices=["valleyiv","wuling"])
     p.add_argument("--unit");p.add_argument("--cycle",type=int,default=0);p.add_argument("--instance")
     p.add_argument("--review");p.add_argument("--execute",action="store_true");p.add_argument("--observe",action="store_true")
     p.add_argument("--status",action="store_true");p.add_argument("--verify");p.add_argument("--outcome");p.add_argument("--evidence")
     a=p.parse_args(argv)
     try:
+        if a.execute:
+            require_native_pc("endfield",a.transport)
         if a.status:
             from endfield_extra_audit import audit
             result=audit(ROOT,day())

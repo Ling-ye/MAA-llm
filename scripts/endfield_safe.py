@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse,json,sys,time,uuid
 from pathlib import Path
 from endfield_common import *
+from project_paths import add_native_transport_argument, require_native_pc
 DISABLE=['DailyTaskUpgradeWeapon','DailyTaskCreation','DailyTaskAssemble','DailyTaskLevelUpOperator']
 ENABLE=['DailyEmailRewardSub','DailyTaskRewardSub','DailyClaimDeliveryJobsRewardSub','DailyProtocolPassRewardSub','DailyEventRewardSub','DailyTaskActivityFullCheck']
 PHASES=['rewards','safe-maintenance','inventory','daily']
@@ -101,9 +102,11 @@ def execute(plan,api=request):
 def main():
  p=argparse.ArgumentParser();p.add_argument('--execute',action='store_true');p.add_argument('--phase',choices=PHASES,default='rewards');p.add_argument('--instance')
  p.add_argument('--record-verification',type=Path);p.add_argument('--evidence',type=Path);p.add_argument('--activity',type=int)
- a=p.parse_args()
+ add_native_transport_argument(p);a=p.parse_args()
  try:
-  if a.execute:require_execution('endfield')
+  if a.execute:
+   require_native_pc('endfield',a.transport)
+   require_execution('endfield')
   if a.record_verification:
    if a.execute or not a.evidence:raise ValueError('Verification is separate from execution and requires evidence')
    result=record_verification(a.record_verification,a.evidence,a.activity);code=0

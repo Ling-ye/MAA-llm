@@ -2,10 +2,17 @@ param(
  [Parameter(Mandatory=$true)][ValidateSet('arknights','gf2','endfield')][string]$Game,
  [Parameter(Mandatory=$true)][string]$Receipt,
  [string]$Python='python',
+ [ValidateSet('mumu','pc')][string]$Transport='mumu',
  [switch]$Execute
 )
 $ErrorActionPreference='Stop'
 $root=$PSScriptRoot
+if($Game -eq 'arknights' -and $Transport -ne 'mumu'){
+ throw 'Arknights supports only the MuMu transport.'
+}
+if($Game -ne 'arknights' -and $Transport -ne 'pc'){
+ throw "Use python scripts/mumu_daily.py status --game $Game for supervised guest cleanup. Only the explicit -Transport pc route inspects or closes Windows clients."
+}
 $r=Get-Content -LiteralPath $Receipt -Raw|ConvertFrom-Json
 $ok=if($Game -eq 'gf2'){$r.verified -eq $true}else{$r.daily_reward_verified -eq $true}
 if($Game -eq 'arknights' -and $r.schema -eq 2){

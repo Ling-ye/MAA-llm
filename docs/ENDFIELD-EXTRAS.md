@@ -1,5 +1,8 @@
 # 终末地新增日常
 
+本页的 MaaEnd/Win32 执行是显式旧 PC 路线；默认 MuMu 见 [固定清单](MUMU-DAILY.md)。不要在 MuMu 受阻时回退。
+
+
 > 谷地三仓请先读 [独立监督转交](ENDFIELD-VALLEY-TRANSFER.md)。旧 valleyiv delivery 自动提交已拒绝；原生填满不能绑定审核 item_name，已有报价不得重新装箱。以下旧谷地计划仅供审阅，其他地区与阶段不变。
 
 本页适用于 MaaEnd v3.1.0 / MaaFramework v5.16.1。提供的受限范围包括谷地两折礼物、仓储装箱后转交、信用领取与抽卡资源优先购物/刷新、两区远程回收；实际操作仍需当前操作者明确授权。`DeliveryJobs` 是新增仓储阶段，不替代 AutoSell / AutoStockpile；原物资调度价格、库存和弹性购买阈值保持不变。
@@ -22,7 +25,7 @@ python scripts/endfield_extras.py --phase credit-buy --unit ArsenalTicket --cycl
 python scripts/endfield_extras.py --phase credit-refresh --cycle 0
 ~~~
 
-每次执行需要 `--review <本地审核JSON> --execute`，且可移植仓库原有 runtime 执行开关必须开启。审核 JSON 的 game_day、phase、region、unit、cycle 必须与命令一致；supervised 必须为 true，reviewed_at 必须带时区且在五分钟内，evidence 必须指向运行根目录内五分钟内的 1280×720 PNG 并含 SHA-256。JSON 只能记录实际看到的界面；格式校验不理解画面，不把哈希当成自动识别。
+每次执行需要 `--transport pc --review <本地审核JSON> --execute`，且可移植仓库原有 runtime 执行开关必须开启。审核 JSON 的 game_day、phase、region、unit、cycle 必须与命令一致；supervised 必须为 true，reviewed_at 必须带时区且在五分钟内，evidence 必须指向运行根目录内五分钟内的 1280×720 PNG 并含 SHA-256。JSON 只能记录实际看到的界面；格式校验不理解画面，不把哈希当成自动识别。
 
 示例见 [endfield-extra-review.json](../config.example/endfield-extra-review.json)。不要直接执行占位示例。review 文件放本地配置目录，图片放运行根的 evidence；不提交它们。
 
