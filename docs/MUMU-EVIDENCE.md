@@ -4,7 +4,7 @@
 
 ## 配置与只读输出
 
-`config.example/mumu-supervised.json` 是禁用示例。复制到本地 `config.local/mumu-supervised.json`，只填已核对的专属实例 `vm_index` 与精确回环 `serial`，再按现有 runtime 规则启用具体游戏和允许游戏日。每款只能用自己的实例；PC 旧路径不是回退。终末地 Android 尚未验收登录和工作流，不允许写入。少前 2 只接受 Windows 已解锁时监督使用 v2.8.6（与 PC 自动适配版本门禁独立）；方舟已建立的 MAA ADB 路径保留当前版本和所有实际画面门禁。
+`config.example/mumu-supervised.json` 是禁用示例。复制到本地 `config.local/mumu-supervised.json`，只填已核对的专属实例 `vm_index` 与精确回环 `serial`，再按现有 runtime 规则启用具体游戏和允许游戏日。每款只能用自己的实例；PC 旧路径不是回退。终末地 Android 尚未验收登录和工作流，不允许写入。少前 2 使用 v2.8.6 的监督路径，不共用 PC 自动适配版本门禁。锁屏/未知时必须用 [guest ADB 探测](MUMU-ADB.md) 的当前 probe_proof，并绑定 screens.primary；尚未覆盖锁屏收尾。方舟已建立的 MAA ADB 路径保留当前版本和所有实际画面门禁。
 
 - `python scripts/mumu_daily.py plan --game gf2`：项目、检查字段、允许跳过原因。
 - `python scripts/mumu_daily.py status --game gf2`：每项当前周期的记录，状态为 unreviewed、reserved、verified、observed_already_done、observed_ineligible、unknown 或 blocked_invalid_receipt。达到活跃度目标不能代替其他项目。

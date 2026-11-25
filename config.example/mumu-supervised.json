@@ -1,4 +1,5 @@
 {
+  "guest_tools": {"mumu_cli": "", "adb_path": ""},
   "emulators": {
     "arknights": {"enabled": false, "vm_index": null, "serial": ""},
     "gf2": {"enabled": false, "vm_index": null, "serial": ""},

@@ -16,7 +16,7 @@ PACKAGES = {"arknights": "com.hypergryph.arknights", "gf2": "com.Sunborn.SnqxExi
             "endfield": "com.hypergryph.endfield"}
 VERSIONS = {"arknights": "v6.22.0", "gf2": "v2.8.6", "endfield": "v3.1.0"}
 VALIDATION = {"arknights": "established_maa_adb_requires_current_readiness",
-              "gf2": "supervised_adb_validated_not_locked_or_unattended",
+              "gf2": "supervised_adb_requires_current_guest_proof_when_locked_not_unattended",
               "endfield": "android_path_not_login_or_workflow_validated"}
 # item : (required scope attestations, required visible result attestations)
 ITEMS = {
@@ -236,8 +236,6 @@ def frame(root, review, game, item, now, bound, *, close_result=False):
          review.get("serial") == bound["serial"] and type(review.get("vm_index")) is int and
          review.get("vm_index") == bound["vm_index"], "wrong guest serial/instance/package/version")
     need(review.get("desktop_state") in ("locked", "unlocked", "unknown"), "declare observed host lock state")
-    if game != "arknights":
-        need(review["desktop_state"] == "unlocked", "guest workflow not validated for locked/unknown host")
     if game == "endfield":
         raise Blocked("Endfield Android login/workflow not validated; plan/status only until reviewed adapter approval")
     all_true(review, "supervised exact_mumu_instance_reviewed adb_device official_package_reviewed decoded_fresh_guest_frame no_unhandled_prompt cross_transport_history_reviewed")
@@ -255,9 +253,25 @@ def frame(root, review, game, item, now, bound, *, close_result=False):
         need(re.fullmatch(r"[a-z][a-z0-9_-]{0,31}", key), "invalid evidence role")
     by_role = {key: evidence(root, value, now) for key, value in shots.items()}
     need(len({e["sha256"] for e in by_role.values()}) == len(by_role), "duplicate evidence roles")
-    return {"at": now.isoformat(), "binding": bound, "day": game_day(now),
-            "desktop_state": review["desktop_state"], "package": review["package"],
-            "maa_version": review["maa_version"], "facts": review["facts"], "screens": by_role}
+    result = {"at":now.isoformat(), "binding":bound, "day":game_day(now),
+              "desktop_state":review["desktop_state"], "package":review["package"],
+              "maa_version":review["maa_version"], "facts":review["facts"], "screens":by_role}
+    if game == "gf2" and (review["desktop_state"] != "unlocked" or review.get("probe_proof")):
+        from mumu_guest import proof
+        ref = review.get("probe_proof")
+        need(isinstance(ref,str) and ref and not close_result,
+             "locked or unknown GF2 host requires a current focused guest proof; close is not yet covered")
+        doc = proof(root,ref,game,bound,now)
+        need("navigation_anchor" not in doc, "use a full-frame proof for daily evidence, not a navigation anchor")
+        primary, guest_frame = by_role["primary"], doc["frame"]
+        need(primary["path"] == guest_frame["path"] and primary["sha256"] == guest_frame["sha256"] and
+             stamp(primary["captured_at"]) == stamp(doc["captured_at"]),
+             "review must cover the exact current ADB guest frame")
+        path = contained(root,ref)
+        result["guest_proof"] = {"path":path.relative_to(root.resolve()).as_posix(),
+                                 "sha256":sha(path.read_bytes())}
+        result["guest_identity"] = doc["identity"]
+    return result
 
 
 def specific_review(item, stage, data, record):
@@ -402,6 +416,9 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
         facts = obs["facts"]
         scope, result_checks = ITEMS[game][item]
         if action == "reserve":
+            if game == "gf2":
+                from mumu_guest import guard_replay
+                guard_replay(root)
             need(not previous or previous["status"] == "observed_ineligible",
                  "existing attempt or prior completion; inspect and do not replay")
             for other_game in ITEMS:
@@ -425,6 +442,9 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
             start = previous["before"]
             need(start["binding"] == obs["binding"] and (item == "tea" or start["day"] == obs["day"]),
                  "reservation context changed")
+            if start.get("guest_identity"):
+                need(start["guest_identity"] == obs.get("guest_identity"),
+                     "GF2 guest process/boot changed; inspect without replay")
             start_screens = start["screens"].values()
             for shot in obs["screens"].values():
                 need(stamp(shot["captured_at"]) > stamp(start["at"]) and

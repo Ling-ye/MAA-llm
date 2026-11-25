@@ -14,9 +14,16 @@ class SessionReadinessTests(unittest.TestCase):
         for desktop in ("locked", "unknown", "unlocked"):
             for game in ("arknights", "gf2", "endfield"):
                 with self.subTest(desktop=desktop, game=game):
-                    result = assess(game, desktop, **(self.observations() | {"current_window_verified": False}))
+                    result = assess(game, desktop, **(self.observations() | {"current_window_verified": False, "guest_transport_proof_valid": True}))
                     self.assertEqual(result["transport"], "mumu")
                     self.assertTrue(result["ready_for_stage_review"])
+
+    def test_gf2_locked_or_unknown_requires_verified_guest_proof(self):
+        for desktop in ("locked","unknown"):
+            result = assess("gf2",desktop,**self.observations())
+            self.assertIn("current_focused_guest_transport_proof",result["missing"])
+            self.assertTrue(assess("gf2",desktop,guest_transport_proof_valid=True,
+                                   **self.observations())["ready_for_stage_review"])
 
     def test_native_games_fail_closed(self):
         for game in ("gf2", "endfield"):

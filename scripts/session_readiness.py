@@ -22,6 +22,9 @@ def assess(game, desktop="unknown", transport="mumu", **observed):
     missing = [key for key in required if observed.get(key) is not True]
     if not serial_ok:
         missing.append("exact_configured_loopback_serial")
+    if transport == "mumu" and game == "gf2" and desktop != "unlocked":
+        if observed.get("guest_transport_proof_valid") is not True:
+            missing.append("current_focused_guest_transport_proof")
     if transport == "pc" and desktop != "unlocked":
         missing.append("interactive_unlocked_desktop")
     return {"game": game, "transport": transport, "ready_for_stage_review": not missing, "missing": missing, "game_action_performed": False}

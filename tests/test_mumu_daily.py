@@ -186,6 +186,50 @@ class MuMuDailyTests(unittest.TestCase):
         # An explicitly reviewed free option appearing later is a separate reservation.
         self.call(item, "reserve", self.review(item, seconds=2), seconds=2)
 
+    def test_locked_gf2_needs_exact_guest_proof_and_continuity(self):
+        from unittest.mock import patch
+        item = "tea"
+        r = self.review(item)
+        r["desktop_state"] = "locked"
+        root = self.root
+        folder = root/"evidence/guest"
+        folder.mkdir()
+        ref = folder/"proof.json"
+        ref.write_text("{}")
+        with self.assertRaisesRegex(m.Blocked,"current focused guest proof"):
+            self.call(item,"reserve",r)
+        r["probe_proof"] = str(ref)
+        ident = dict(self.binding, pid=100)
+        primary = r["screens"]["primary"]
+        doc = {"frame":{"path":Path(primary["path"]).relative_to(root).as_posix(),
+                        "sha256":primary["sha256"]},"captured_at":primary["captured_at"],"identity":ident}
+        with patch("mumu_guest.proof",return_value=doc):
+            bad = self.review(item)
+            bad.update({"desktop_state":"locked","probe_proof":str(ref)})
+            with self.assertRaisesRegex(m.Blocked,"exact current ADB guest frame"):
+                self.call(item,"reserve",bad)
+            self.call(item,"reserve",r)
+        r = self.review(item,seconds=2)
+        r.update({"desktop_state":"unknown","probe_proof":str(ref)})
+        primary = r["screens"]["primary"]
+        doc = {"frame":{"path":Path(primary["path"]).relative_to(root).as_posix(),
+                        "sha256":primary["sha256"]},"captured_at":primary["captured_at"],
+               "identity":dict(ident,pid=101)}
+        with patch("mumu_guest.proof",return_value=doc):
+            with self.assertRaisesRegex(m.Blocked,"process/boot changed"):
+                self.call(item,"verify",r,seconds=2)
+            doc["identity"] = ident
+            self.assertEqual(self.call(item,"verify",r,seconds=2)["status"],"verified")
+
+    def test_unknown_guest_gesture_blocks_new_daily_reservation(self):
+        from mumu_guest import unresolved
+        from supervised_evidence import save
+        path = unresolved(self.root)
+        path.parent.mkdir(parents=True)
+        save(path, {"status":"unknown_after_submission"})
+        with self.assertRaisesRegex(m.Blocked, "previous guest input unconfirmed"):
+            self.call("watering","reserve",self.review("watering"))
+
     def test_endfield_none_until_login_workflow_validation(self):
         with self.assertRaises(m.Blocked):
             self.call("daily-rewards", "reserve", self.review("daily-rewards", game="endfield"), game="endfield")
