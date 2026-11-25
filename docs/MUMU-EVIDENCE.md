@@ -35,6 +35,7 @@
 | dispatch-production | 同入口，selected_method=资源生产、price=0、记录 stored，并另附 reward 帧。先核对拼图和生产，再做突破扫荡；不是领取派遣/重派或周档 |
 | weekly-free-box | location=[商城,品质甄选,臻品礼包,主题精选]、product=周周乐补给箱、price_text=免费、price=0、paid_balance。预约核对 limit=周限购1/1、control=购买、progress=goal；提交一次；验收同一周货项剩余0、付费余额不变及 reward 帧。相邻商品换位不是重试理由 |
 | dispatch-weekly-* | facts.tier 必须精确匹配档位；实际周重置需复核，观察未解锁档不等于已领 |
+| cooking | 未见可用的免费常规制作，且任务仍为 0/1 时可用 observe，observation=ineligible、reason=no_eligible_free_recipe。需 screens.primary（自研：暂无可选择食材）、creative（创意：暂无可选择菜谱）、archive（芝士烤土豆只有前往升级），并在 facts 填 cooking_task_progress=0/1、research_notice、creative_notice、archive_recipe=芝士烤土豆、archive_control=前往升级、free_regular_action_absent=true。只是当次未完成记录，不开付费、升级或替代动作。 |
 | tea | 预约：recipe=红枣茶、recipe_level=4、confirmation_recipe=红枣茶、cost_reviewed_free=true、fee_or_premium_prompt=false、free_uses_remaining=1；另附 confirm 帧。验收：tea_task_progress=1/1、cup_active_reviewed=true、effect_type=饮品加成、effect_text=每消耗10情报拼图，可获取2~3数据链路，另附 drink_effect 帧。菜品加成、单独任务计数或制作后弹窗均不能替代。 |
 | event-material | event=热寂悖论、stage=DF-1-5 于乱流中 V、material_mode=true；已知战斗截止后只观察，不替换活动 |
 

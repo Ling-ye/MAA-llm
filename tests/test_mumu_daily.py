@@ -164,6 +164,28 @@ class MuMuDailyTests(unittest.TestCase):
         result = self.call(item, "verify", done, seconds=4, game=game)
         self.assertFalse(result["game_action_performed"])
 
+    def test_cooking_no_eligible_recipe_is_observation_not_completion(self):
+        item = "cooking"
+        review = self.review(item, cooking_task_progress="0/1",
+                             research_notice="暂无可选择食材", creative_notice="暂无可选择菜谱",
+                             archive_recipe="芝士烤土豆", archive_control="前往升级",
+                             free_regular_action_absent=True)
+        review.update(observation="ineligible", reason="no_eligible_free_recipe")
+        with self.assertRaises(m.Blocked):
+            self.call(item, "observe", review)
+        review["screens"].update(creative=self.frame(self.now), archive=self.frame(self.now))
+        for fields in ({"free_regular_action_absent": False}, {"cooking_task_progress": "1/1"},
+                       {"archive_control": "制作"}, {"research_notice": "unknown"}):
+            attempt = dict(review, facts=dict(review["facts"], **fields))
+            with self.subTest(fields=fields), self.assertRaises(m.Blocked):
+                self.call(item, "observe", attempt)
+        self.assertEqual(self.call(item, "observe", review)["status"], "observed_ineligible")
+        result = m.load_record(self.root, "gf2", item, self.now)
+        self.assertNotIn("after", result)
+        self.assertNotIn("before", result)
+        # An explicitly reviewed free option appearing later is a separate reservation.
+        self.call(item, "reserve", self.review(item, seconds=2), seconds=2)
+
     def test_endfield_none_until_login_workflow_validation(self):
         with self.assertRaises(m.Blocked):
             self.call("daily-rewards", "reserve", self.review("daily-rewards", game="endfield"), game="endfield")

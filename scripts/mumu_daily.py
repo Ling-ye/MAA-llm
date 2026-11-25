@@ -117,6 +117,7 @@ SKIP = {
     "squad-duty-supply": {"no_matching_eligible_supply"},
     "tea": {"not_yet_available"},
     "watering": {"no_existing_flower"},
+    "cooking": {"no_eligible_free_recipe"},
     "breakthrough-sweep": {"no_eligible_resource", "stage_unavailable"},
     **{f"dispatch-weekly-{tier}": {"tier_not_yet_unlocked"} for tier in (5, 10, 15, 25)},
 }
@@ -145,7 +146,8 @@ def checklist(game):
              "first_review": list(BEFORE_SWEEP) if item == "breakthrough-sweep" else [],
              **({"optional_explicit_scope": True} if item == "sanity-event-stage" else {}),
              **({"reset_cn": "05:00", "before_roles": ["primary", "confirm"],
-                 "after_roles": ["primary", "drink_effect"]} if item == "tea" else {})}
+                 "after_roles": ["primary", "drink_effect"]} if item == "tea" else {}),
+             **({"ineligible_roles": ["primary", "creative", "archive"]} if item == "cooking" else {})}
             for item, (before, after) in ITEMS[game].items()]
 
 
@@ -443,6 +445,15 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
                 allowed = set(SKIP.get(item, ()))
                 need(outcome == "ineligible" and review.get("reason") in allowed, "unapproved skip or unknown state")
                 all_true(facts, "exact_ineligibility_visually_confirmed")
+                if item == "cooking" and review["reason"] == "no_eligible_free_recipe":
+                    need({"primary", "creative", "archive"} <= obs["screens"].keys()
+                         and facts.get("cooking_task_progress") == "0/1"
+                         and facts.get("research_notice") == "暂无可选择食材"
+                         and facts.get("creative_notice") == "暂无可选择菜谱"
+                         and facts.get("archive_recipe") == "芝士烤土豆"
+                         and facts.get("archive_control") == "前往升级"
+                         and facts.get("free_regular_action_absent") is True,
+                         "verify both empty modes, read-only recipe and incomplete cooking task")
                 status = "observed_ineligible"
             data = {"schema": 1, "game": game, "item": item, "period": period(item, now),
                     "status": status, "observation": obs, "history": previous.get("history", []) if previous else []}
