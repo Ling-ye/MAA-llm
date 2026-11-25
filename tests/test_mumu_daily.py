@@ -38,6 +38,13 @@ class MuMuDailyTests(unittest.TestCase):
         d.update(game=game, item=item, day=m.game_day(at), transport="mumu", package=m.PACKAGES[game],
                  maa_version=m.VERSIONS[game], desktop_state="unlocked",
                  reviewed_period=m.period(item, at), screens={"primary": self.frame(at)}, facts=f, **self.binding)
+        if item == "tea":
+            f.update(recipe="红枣茶", recipe_level=4, confirmation_recipe="红枣茶",
+                     cost_reviewed_free=True, fee_or_premium_prompt=False, free_uses_remaining=1,
+                     effect_type="饮品加成", effect_text="每消耗10情报拼图，可获取2~3数据链路",
+                     cup_active_reviewed=True, tea_task_progress="1/1")
+            d["screens"].update(confirm=self.frame(at), drink_effect=self.frame(at))
+            f.update(specific)
         return d
 
     def call(self, item, action, review=None, seconds=0, game="gf2", reason=None):
@@ -87,6 +94,75 @@ class MuMuDailyTests(unittest.TestCase):
         Path(r["screens"]["primary"]["path"]).write_bytes(b"broken")
         status = m.reported_state(self.root, "gf2", self.now)
         self.assertIn({"id": item, "period": m.game_day(self.now), "status": "blocked_invalid_receipt"}, status["items"])
+
+    def test_tea_requires_matching_free_confirmation_and_drink_proof(self):
+        item = "tea"
+        review = self.review(item, recipe_level=3)
+        with self.assertRaises(m.Blocked):
+            self.call(item, "reserve", review)
+        for fields in ({"fee_or_premium_prompt": True}, {"free_uses_remaining": 0},
+                       {"confirmation_recipe": "其他饮品"}, {"cost_reviewed_free": False}):
+            with self.subTest(fields=fields), self.assertRaises(m.Blocked):
+                self.call(item, "reserve", self.review(item, **fields))
+        review = self.review(item)
+        del review["screens"]["confirm"]
+        with self.assertRaises(m.Blocked):
+            self.call(item, "reserve", review)
+        self.call(item, "reserve", self.review(item))
+        for fields in ({"effect_type": "菜品加成"}, {"effect_text": "回复体力"},
+                       {"cup_active_reviewed": False}, {"tea_task_progress": "0/1"}):
+            with self.subTest(fields=fields), self.assertRaises(m.Blocked):
+                self.call(item, "verify", self.review(item, seconds=1, **fields), seconds=1)
+        review = self.review(item, seconds=2)
+        del review["screens"]["drink_effect"]
+        with self.assertRaises(m.Blocked):
+            self.call(item, "verify", review, seconds=2)
+        self.call(item, "verify", self.review(item, seconds=3), seconds=3)
+
+    def test_tea_cycle_uses_cn_five_not_generic_four(self):
+        before = dt.datetime(2030, 1, 10, 20, 59, tzinfo=dt.timezone.utc)
+        after = before + dt.timedelta(minutes=1)
+        self.assertEqual(m.game_day(before), m.game_day(after))
+        self.assertEqual(m.period("tea", before), "2030-01-10")
+        self.assertEqual(m.period("tea", after), "2030-01-11")
+        self.assertEqual(m.period("cooking", before), m.period("cooking", after))
+
+    def test_tea_keeps_same_claim_at_general_reset_and_rejects_prev_cycle_frame(self):
+        self.now = dt.datetime(2030, 1, 10, 19, 59, 59, tzinfo=dt.timezone.utc)
+        self.call("tea", "reserve", self.review("tea"))
+        with self.assertRaises(m.Blocked):
+            self.call("tea", "reserve", self.review("tea", seconds=2), seconds=2)
+        self.call("tea", "verify", self.review("tea", seconds=2), seconds=2)
+        self.now += dt.timedelta(hours=1, seconds=1)
+        review = self.review("tea")
+        review["screens"]["primary"] = self.frame(self.now-dt.timedelta(seconds=1))
+        with self.assertRaisesRegex(m.Blocked, "05:00 reset"):
+            self.call("tea", "reserve", review)
+
+    def test_event_exact_window_and_native_result_not_maa(self):
+        item, game = "sanity-event-stage", "arknights"
+        before = dict(stage="AB-7", mode="native-auto-deploy", event="synthetic event",
+                      battle_starts_at=(self.now-dt.timedelta(days=1)).isoformat(),
+                      battle_ends_at=(self.now+dt.timedelta(hours=1)).isoformat(),
+                      sanity_per_run=18, planned_runs=2, natural_sanity_before=40, refill_or_retry=False)
+        for fields in ({"mode":"maa"}, {"stage":"TL-9"}, {"planned_runs":3}, {"refill_or_retry":True},
+                       {"battle_ends_at":self.now.isoformat()}):
+            review = self.review(item, game=game, **dict(before, **fields))
+            review["screens"]["event_window"] = self.frame(self.now)
+            with self.subTest(fields=fields), self.assertRaises(m.Blocked):
+                self.call(item, "reserve", review, game=game)
+        review = self.review(item, game=game, **before)
+        review["screens"]["event_window"] = self.frame(self.now)
+        self.call(item, "reserve", review, game=game)
+        for count, cost in ((1,18),(2,35)):
+            attempt = self.review(item, game=game, seconds=3, completed_runs=count, observed_sanity_spent=cost, **before)
+            attempt["screens"]["result"] = self.frame(self.now+dt.timedelta(seconds=3))
+            with self.assertRaises(m.Blocked):
+                self.call(item, "verify", attempt, seconds=3, game=game)
+        done = self.review(item, game=game, seconds=4, completed_runs=2, observed_sanity_spent=36, **before)
+        done["screens"]["result"] = self.frame(self.now+dt.timedelta(seconds=4))
+        result = self.call(item, "verify", done, seconds=4, game=game)
+        self.assertFalse(result["game_action_performed"])
 
     def test_endfield_none_until_login_workflow_validation(self):
         with self.assertRaises(m.Blocked):

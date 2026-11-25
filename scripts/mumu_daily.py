@@ -3,6 +3,7 @@ import argparse
 import datetime as dt
 import json
 import re
+import unicodedata
 from pathlib import Path
 
 from project_paths import config_path, require_execution
@@ -22,6 +23,9 @@ ITEMS = {
     "arknights": {
         "sanity-tl9": ("tl9 exact_current_open_stage auto_deploy natural_sanity_only",
                        "same_stage_clear sanity_delta_verified"),
+        "sanity-event-stage": (
+            "explicit_stage_and_window_authorized exact_current_open_stage auto_deploy natural_sanity_only prior_sanity_runs_reviewed",
+            "same_stage_clear exact_completed_count sanity_delta_verified"),
         "public-recruit": ("operations_v2 high_priority_tags_protected refresh_policy_reviewed expedite_limit_reviewed",
                            "recruitment_slots_verified refresh_and_expedite_delta_verified"),
         "base": ("operations_v2 full_facility_rotation money_trade_drone_only",
@@ -102,6 +106,7 @@ WEEKLY = {"weekly-free-box", *(f"dispatch-weekly-{tier}" for tier in (5, 10, 15,
 BEFORE_SWEEP = ("dispatch-stored-puzzle", "dispatch-production")
 SKIP = {
     "sanity-tl9": {"stage_closed", "auto_deploy_unavailable", "no_eligible_resource"},
+    "sanity-event-stage": {"stage_closed", "auto_deploy_unavailable", "no_eligible_resource"},
     "event-material": {"event_closed", "no_eligible_resource", "stage_unavailable"},
     "prewar-signin": {"event_closed", "not_yet_available"},
     "dispatch-stored-puzzle": {"nothing_stored", "would_overflow"},
@@ -122,6 +127,10 @@ def game_day(now):
 
 
 def period(item, now):
+    # GF2's recipe archive shows a 05:00 CN reset for drinks, not the
+    # generic 04:00 game-day boundary used for other items.
+    if item == "tea":
+        return (now.astimezone(TZ) - dt.timedelta(hours=5)).date().isoformat()
     day = game_day(now)
     if item not in WEEKLY:
         return day
@@ -133,7 +142,10 @@ def checklist(game):
     return [{"id": item, "period": "weekly" if item in WEEKLY else "daily",
              "before_checks": before.split(), "after_checks": after.split(),
              "allowed_skip_reasons": sorted(SKIP.get(item, ())),
-             "first_review": list(BEFORE_SWEEP) if item == "breakthrough-sweep" else []}
+             "first_review": list(BEFORE_SWEEP) if item == "breakthrough-sweep" else [],
+             **({"optional_explicit_scope": True} if item == "sanity-event-stage" else {}),
+             **({"reset_cn": "05:00", "before_roles": ["primary", "confirm"],
+                 "after_roles": ["primary", "drink_effect"]} if item == "tea" else {})}
             for item, (before, after) in ITEMS[game].items()]
 
 
@@ -246,9 +258,59 @@ def frame(root, review, game, item, now, bound, *, close_result=False):
             "maa_version": review["maa_version"], "facts": review["facts"], "screens": by_role}
 
 
-def gf2_specific(item, stage, data, record):
+def specific_review(item, stage, data, record):
     f = data["facts"]
     before = record["before"]["facts"] if record and stage == "verify" else None
+    if item == "tea":
+        tea_period = period(item, stamp(data["at"]))
+        need(all(period(item, stamp(shot["captured_at"])) == tea_period for shot in data["screens"].values()),
+             "tea evidence crosses actual 05:00 reset")
+        need(f.get("recipe") == "红枣茶" and type(f.get("recipe_level")) is int and f["recipe_level"] == 4,
+             "only the reviewed Lv4 red-date tea is covered")
+        if stage == "reserve":
+            need("confirm" in data["screens"] and f.get("confirmation_recipe") == f["recipe"]
+                 and f.get("cost_reviewed_free") is True and f.get("fee_or_premium_prompt") is False
+                 and type(f.get("free_uses_remaining")) is int and f["free_uses_remaining"] == 1,
+                 "same named tea confirmation with one free use and no cost required")
+        else:
+            effect = f.get("effect_text")
+            normalized = re.sub(r"[\s，,。]", "", unicodedata.normalize("NFKC", effect)) if isinstance(effect, str) else ""
+            need("drink_effect" in data["screens"] and f.get("effect_type") == "饮品加成"
+                 and normalized == "每消耗10情报拼图可获取2~3数据链路"
+                 and f.get("cup_active_reviewed") is True and f.get("tea_task_progress") == "1/1",
+                 "actual drink effect plus completed tea task required; cooking effect is not proof")
+            if before:
+                need(before.get("recipe") == f["recipe"], "result is not bound to the reserved beverage")
+    if item == "sanity-event-stage":
+        stage_id, mode = f.get("stage"), f.get("mode")
+        need(isinstance(stage_id, str) and re.fullmatch(r"[A-Z]{1,5}-[1-9][0-9]{0,2}", stage_id)
+             and stage_id != "TL-9" and mode == "native-auto-deploy"
+             and isinstance(f.get("event"), str) and bool(f["event"].strip()),
+             "exact normal event stage and native auto-deploy only; TL-9 has a separate item")
+        opened, closed = stamp(f.get("battle_starts_at")), stamp(f.get("battle_ends_at"))
+        at = stamp(data["at"])
+        need(opened < closed and closed - opened <= dt.timedelta(days=31),
+             "short explicit battle window required, not shop deadline")
+        if stage == "reserve":
+            need("event_window" in data["screens"] and opened <= at < closed,
+                 "fresh stage/window screenshots required before actual battle deadline")
+            need(0 <= (at - stamp(data["screens"]["event_window"]["captured_at"])).total_seconds() <= 300,
+                 "event evidence is stale")
+            need(integer(f.get("sanity_per_run"), 1) and integer(f.get("planned_runs"), 1)
+                 and f["planned_runs"] <= 100 and integer(f.get("natural_sanity_before"), 1)
+                 and f["planned_runs"] * f["sanity_per_run"] <= f["natural_sanity_before"]
+                 and f.get("refill_or_retry") is False,
+                 "bounded count and sufficient current natural sanity required, no refills")
+        else:
+            need("result" in data["screens"] and opened <= at and integer(f.get("completed_runs"), 1)
+                 and integer(f.get("observed_sanity_spent"), 1),
+                 "visible completion, run count and observed natural sanity cost required")
+            if before:
+                need(all(f.get(k) == before.get(k) for k in
+                         ("stage", "mode", "event", "battle_starts_at", "battle_ends_at"))
+                     and f["completed_runs"] == before["planned_runs"]
+                     and f["observed_sanity_spent"] == f["completed_runs"] * before["sanity_per_run"],
+                     "wrong stage/window/count/cost; inspect partial result without retry")
     if item == "daily-free-box":
         need(f.get("location") == ["商城", "品质甄选", "周期礼包", "每日礼包"] and
              f.get("product") == "每日补给箱" and f.get("price_text") == "免费" and
@@ -353,20 +415,21 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
                     r = load_record(root, game, required, now)
                     need(r and r["status"] in ("verified", "observed_already_done", "observed_ineligible"),
                          "review stored puzzle and production independently before sweeping")
-            gf2_specific(item, action, obs, None)
+            specific_review(item, action, obs, None)
             data = {"schema": 1, "game": game, "item": item, "period": period(item, now),
                     "status": "reserved", "before": obs, "history": previous.get("history", []) if previous else []}
         elif action == "verify":
             need(previous and previous["status"] == "reserved", "no matching reservation; never create success retroactively")
             start = previous["before"]
-            need(start["binding"] == obs["binding"] and start["day"] == obs["day"], "reservation context changed")
+            need(start["binding"] == obs["binding"] and (item == "tea" or start["day"] == obs["day"]),
+                 "reservation context changed")
             start_screens = start["screens"].values()
             for shot in obs["screens"].values():
                 need(stamp(shot["captured_at"]) > stamp(start["at"]) and
                      shot["sha256"] not in {old["sha256"] for old in start_screens},
                      "fresh, distinct post-action evidence required")
             all_true(facts, result_checks)
-            gf2_specific(item, action, obs, previous)
+            specific_review(item, action, obs, previous)
             data = {**previous, "status": "verified", "after": obs}
         elif action == "observe":
             need(not previous or previous["status"] == "observed_ineligible",
@@ -374,7 +437,7 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
             outcome = review.get("observation")
             if outcome == "already_done":
                 all_true(facts, scope + " " + result_checks + " prior_completion_visually_confirmed")
-                gf2_specific(item, action, obs, None)
+                specific_review(item, action, obs, None)
                 status = "observed_already_done"
             else:
                 allowed = set(SKIP.get(item, ()))
