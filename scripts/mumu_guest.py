@@ -30,7 +30,57 @@ def load(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 
-def checked_png(data, anchor=None):
+DARK_GLYPH = "dark-glyph"
+
+
+def dark_glyph(width, height, lumas):
+    """Opaque dark foreground only. Ambiguous/background-filled regions are not controls."""
+    need(width*height <= 80000 and len(lumas) == width*height, "glyph anchor too large")
+    core = {i for i,v in enumerate(lumas) if v <= 88}
+    area = width*height
+    need(max(120, area//100) <= len(core) <= area//3 and
+         sum(v >= 145 for v in lumas) >= area//4, "need one isolated contrasting dark control")
+    # Keep the sole dominant component; disconnected background flecks are not evidence.
+    pending = core.copy()
+    primary = set()
+    while pending:
+        start = pending.pop()
+        frontier, component = [start], {start}
+        while frontier:
+            i = frontier.pop()
+            x,y = i%width,i//width
+            for xx,yy in ((x-1,y),(x+1,y),(x,y-1),(x,y+1)):
+                if 0 <= xx < width and 0 <= yy < height:
+                    n=yy*width+xx
+                    if n in pending:
+                        pending.remove(n)
+                        component.add(n)
+                        frontier.append(n)
+        if len(component)>len(primary):
+            primary=component
+    need(len(primary)*10 >= 9*len(core), "dark control is not a unique continuous shape")
+    xs=[i%width for i in primary]
+    ys=[i//width for i in primary]
+    box=(min(xs),min(ys),max(xs),max(ys))
+    need(3 <= box[0] < box[2] <= width-4 and 3 <= box[1] < box[3] <= height-4 and
+         box[2]-box[0]>=width//8 and box[3]-box[1]>=height//8,
+         "dark glyph must be distinct from anchor edges")
+    digest=hashlib.sha256(b"".join(struct.pack(">I",i) for i in sorted(primary))).hexdigest()
+    return {"pixels":primary, "box":box, "center":(sum(xs)/len(xs),sum(ys)/len(ys)), "digest":digest}
+
+
+def same_glyph(a,b):
+    pa,pb=a["pixels"],b["pixels"]
+    # No translation/alignment tolerance. A one-pixel translated control normally
+    # fails the centroid check even if its binary overlap is high.
+    return (
+        len(pa & pb)*100 >= len(pa | pb)*96 and
+        all(abs(x-y) <= 1 for x,y in zip(a["box"],b["box"])) and
+        all(abs(x-y) <= 0.40 for x,y in zip(a["center"],b["center"]))
+    )
+
+
+def checked_png(data, anchor=None, profile="exact"):
     """Integrity/decode check for Android's 8-bit RGB/RGBA non-interlaced PNG."""
     need(isinstance(data, bytes) and 45 < len(data) <= UP_TO and data.startswith(PNG),
          "guest PNG missing or oversized")
@@ -66,12 +116,16 @@ def checked_png(data, anchor=None):
     w, h = dims
     anchor_digest = None
     anchor_pixels = set()
+    anchor_lumas = []
+    need(profile in ("exact",DARK_GLYPH) and (profile=="exact" or anchor is not None),
+         "glyph profile requires a bounded anchor")
     if anchor is not None:
         need(isinstance(anchor,(tuple,list)) and len(anchor)==4 and
              all(type(k) is int for k in anchor),"invalid navigation anchor")
         x1,y1,x2,y2 = anchor
         need(0 <= x1 < x2 <= w and 0 <= y1 < y2 <= h and x2-x1 >= 80 and y2-y1 >= 48 and
              (x2-x1)*(y2-y1) <= (w*h)//4, "anchor must cover a focused, bounded visible UI region")
+        need(profile=="exact" or (x2-x1)*(y2-y1) <= 80000, "glyph anchor too large")
         anchor_digest = hashlib.sha256()
     line = 1 + w * stride
     max_raw = line*h
@@ -106,7 +160,10 @@ def checked_png(data, anchor=None):
         if anchor is not None and y1 <= y < y2:
             crop = pixels[x1*stride:x2*stride]
             anchor_digest.update(crop)
-            if len(anchor_pixels)<2:
+            if profile == DARK_GLYPH:
+                for x in range(0,len(crop),stride):
+                    anchor_lumas.append((54*crop[x]+183*crop[x+1]+19*crop[x+2])//256)
+            elif len(anchor_pixels)<2:
                 anchor_pixels.update(bytes(crop[x:x+3]) for x in range(0,len(crop),stride))
         if not contrasting and y % max(1,h//32) == 0:
             for x in range(0,w,max(1,w//32)):
@@ -121,8 +178,10 @@ def checked_png(data, anchor=None):
         if anchor is not None and contrasting and y >= y2-1:
             break
         previous = pixels
-    need(contrasting and len(anchor_pixels) > 1,
+    need(contrasting and (profile == DARK_GLYPH or len(anchor_pixels) > 1),
          "guest PNG flat or blank, or navigation anchor has no visible contrast")
+    if profile == DARK_GLYPH:
+        return list(dims),dark_glyph(x2-x1,y2-y1,anchor_lumas)
     return list(dims),anchor_digest.hexdigest()
 
 
@@ -218,7 +277,7 @@ def rel(root,path):
     return path.relative_to(root).as_posix()
 
 
-def record_frame(root, captured, anchor=None):
+def record_frame(root, captured, anchor=None, profile="exact"):
     identity, image, at, size = captured
     directory = contained(root,"evidence/guest")
     directory.mkdir(parents=True,exist_ok=True)
@@ -230,8 +289,9 @@ def record_frame(root, captured, anchor=None):
     body = {"schema": 1, "transport":"mumu-adb", "identity":identity, "captured_at":at.isoformat(),
             "frame":{"path":rel(root,picture),"sha256":sha(image),"raw_size":size}}
     if anchor is not None:
-        _, digest = checked_png(image,anchor)
-        body["navigation_anchor"] = {"rect":anchor,"pixel_sha256":digest}
+        _, compared = checked_png(image,anchor,profile)
+        body["navigation_anchor"] = {"rect":anchor,"pixel_sha256":compared} if profile=="exact" else {
+            "rect":anchor, "profile":DARK_GLYPH, "shape_sha256":compared["digest"]}
     save(doc, body, exclusive=True)
     return {"probe": rel(root,doc), "frame": body["frame"], "captured_at": body["captured_at"],
             **({"navigation_anchor":body["navigation_anchor"]} if anchor is not None else {})}
@@ -260,8 +320,12 @@ def proof(root, receipt, game, bound, now):
          "guest probe PNG changed")
     if "navigation_anchor" in body:
         anchor=body["navigation_anchor"]
-        _, digest=checked_png(raw,anchor["rect"])
-        need(digest == anchor["pixel_sha256"],"guest navigation anchor changed")
+        profile=anchor.get("profile","exact")
+        _, compared=checked_png(raw,anchor["rect"],profile)
+        if profile == DARK_GLYPH:
+            need(compared["digest"] == anchor["shape_sha256"], "guest reviewed glyph changed")
+        else:
+            need(compared == anchor["pixel_sha256"],"guest navigation anchor changed")
     return body
 
 
@@ -324,15 +388,36 @@ def gesture(root, guest, action, receipt, xy, *, reviewed, navigation, item, aut
             need(not any((load_record(root,"gf2",name,utcnow()) or {}).get("status") == "reserved"
                          for name in ITEMS["gf2"]), "finish the reserved GF2 item before unscoped navigation")
         current = guest.capture()
-        ident, image, _, size = current
+        ident, image, current_at, size = current
+        glyph_box = None
         need(ident == expected["identity"] and size == expected["frame"]["raw_size"],
              "guest state or frame changed; capture and review again")
         anchor = expected.get("navigation_anchor")
         if anchor is not None:
             need(navigation and not item, "pixel anchor is for non-spending navigation only")
-            _, current_digest = checked_png(image,anchor["rect"])
-            need(current_digest == anchor["pixel_sha256"],
-                 "reviewed navigation anchor changed; capture a new frame")
+            profile = anchor.get("profile","exact")
+            if profile == DARK_GLYPH:
+                need(action == "tap", "glyph anchor allows only one non-spending navigation tap")
+                raw_path = contained(root,expected["frame"]["path"])
+                original = raw_path.read_bytes()
+                need(sha(original) == expected["frame"]["sha256"], "reviewed glyph source changed")
+                _, reviewed_glyph = checked_png(original,anchor["rect"],profile)
+                _, first_glyph = checked_png(image,anchor["rect"],profile)
+                need(same_glyph(reviewed_glyph,first_glyph), "reviewed dark control shifted or changed")
+                time.sleep(0.18)
+                identity2,image2,at2,size2 = guest.capture()
+                need(identity2 == ident and size2 == size and at2>current_at,
+                     "second fresh glyph frame changed guest identity or clock order")
+                _, second_glyph = checked_png(image2,anchor["rect"],profile)
+                need(same_glyph(reviewed_glyph,second_glyph) and same_glyph(first_glyph,second_glyph),
+                     "second fresh frame did not confirm the reviewed dark control")
+                glyph_box = tuple(
+                    (min(a,b,c) if i<2 else max(a,b,c))
+                    for i,(a,b,c) in enumerate(zip(reviewed_glyph["box"],first_glyph["box"],second_glyph["box"])))
+            else:
+                _, current_digest = checked_png(image,anchor["rect"])
+                need(current_digest == anchor["pixel_sha256"],
+                     "reviewed navigation anchor changed; capture a new frame")
         else:
             need(sha(image) == expected["frame"]["sha256"],
                  "guest state or frame changed; capture and review again")
@@ -349,6 +434,11 @@ def gesture(root, guest, action, receipt, xy, *, reviewed, navigation, item, aut
             x1,y1,x2,y2 = anchor["rect"]
             need(all(x1 <= x < x2 and y1 <= y < y2 for x,y in zip(points[::2],points[1::2])),
                  "gesture must stay inside reviewed navigation anchor")
+            if glyph_box is not None:
+                gx1,gy1,gx2,gy2=glyph_box
+                xx,yy=xy[0]-x1,xy[1]-y1
+                need(gx1 <= xx <= gx2 and gy1 <= yy <= gy2,
+                     "navigation tap must target the verified visible control bounds")
         used = contained(root,"state/guest-steps/"+expected["integrity_sha256"]+".json")
         used.parent.mkdir(parents=True,exist_ok=True)
         stop(root)
@@ -387,6 +477,8 @@ def main(argv=None, *, root=ROOT, load_config=config, command=run, authorize=req
     p.add_argument("--xy",type=int,nargs="+")
     p.add_argument("--anchor",type=int,nargs=4,metavar=("X1","Y1","X2","Y2"),
                    help="probe an area for reviewed non-spending navigation only")
+    p.add_argument("--anchor-profile",choices=("exact",DARK_GLYPH),default="exact",
+                   help="optional isolated dark control for a non-spending navigation tap")
     p.add_argument("--reason")
     a=p.parse_args(argv)
     try:
@@ -397,14 +489,16 @@ def main(argv=None, *, root=ROOT, load_config=config, command=run, authorize=req
         if a.action == "probe":
             need(not (a.probe_proof or a.reviewed_frame or a.navigation or a.item or a.xy or a.reason),
                  "probe never accepts input arguments")
-            result={**record_frame(root,guest.capture(),a.anchor),"status":"guest_frame_ready_not_game_verification",
+            need(a.anchor_profile=="exact" or (a.game=="gf2" and a.anchor),
+                 "dark-glyph needs an explicit GF2 navigation anchor")
+            result={**record_frame(root,guest.capture(),a.anchor,a.anchor_profile),"status":"guest_frame_ready_not_game_verification",
                     "game_action_performed":False}
         elif a.action == "acknowledge":
-            need(a.probe_proof and not (a.xy or a.item or a.navigation or a.anchor),
+            need(a.probe_proof and a.anchor_profile=="exact" and not (a.xy or a.item or a.navigation or a.anchor),
                  "acknowledgment takes a fresh probe and reason, never input")
             result=acknowledge(root,guest,a.probe_proof,a.reason,a.reviewed_frame,authorize)
         else:
-            need(a.probe_proof and a.xy and not (a.reason or a.anchor), "gesture requires reviewed probe and raw coordinates")
+            need(a.probe_proof and a.xy and a.anchor_profile=="exact" and not (a.reason or a.anchor), "gesture requires reviewed probe and raw coordinates")
             result=gesture(root,guest,a.action,a.probe_proof,a.xy,reviewed=a.reviewed_frame,
                            navigation=a.navigation,item=a.item,authorize=authorize)
         print(json.dumps(result,ensure_ascii=False))
