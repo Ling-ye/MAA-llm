@@ -31,7 +31,7 @@ class MuMuDailyTests(unittest.TestCase):
 
     def review(self, item, outcome="reserve", game="gf2", seconds=0, **specific):
         at = self.now + dt.timedelta(seconds=seconds)
-        scope, results = m.ITEMS[game][item]
+        scope, results = m.item_checks(game,item)
         f = dict.fromkeys((scope + " " + results + " current_exact_item_eligible prior_completion_visually_confirmed exact_ineligibility_visually_confirmed").split(), True)
         f.update(specific)
         d = dict.fromkeys("""supervised exact_mumu_instance_reviewed adb_device official_package_reviewed decoded_fresh_guest_frame no_unhandled_prompt cross_transport_history_reviewed correct_account_home_reviewed expected_foreground_package_reviewed actual_weekly_cycle_reviewed""".split(), True)
@@ -44,6 +44,12 @@ class MuMuDailyTests(unittest.TestCase):
                      effect_type="饮品加成", effect_text="每消耗10情报拼图，可获取2~3数据链路",
                      cup_active_reviewed=True, tea_task_progress="1/1")
             d["screens"].update(confirm=self.frame(at), drink_effect=self.frame(at))
+            f.update(specific)
+        if item == "cooking":
+            f.update(menu="常规菜品", recipe="芝士烤土豆", recipe_control="下一步",
+                     final_control="确认邀请", first_serving_free_visible=True, fee_or_premium_prompt=False,
+                     cooking_task_progress="0/1")
+            d["screens"]["recipe"] = self.frame(at)
             f.update(specific)
         return d
 
@@ -174,8 +180,13 @@ class MuMuDailyTests(unittest.TestCase):
         with self.assertRaises(m.Blocked):
             self.call(item, "observe", review)
         review["screens"].update(creative=self.frame(self.now), archive=self.frame(self.now))
-        for fields in ({"free_regular_action_absent": False}, {"cooking_task_progress": "1/1"},
-                       {"archive_control": "制作"}, {"research_notice": "unknown"}):
+        with self.assertRaises(m.Blocked):
+            self.call(item, "observe", review)
+        review["screens"]["regular"] = self.frame(self.now)
+        review["facts"].update(reviewed_menu="常规菜品", regular_first_free_unavailable_verified=True,
+                               standard_recipe_next_absent_verified=True)
+        for fields in ({"regular_first_free_unavailable_verified": False}, {"cooking_task_progress": "1/1"},
+                       {"standard_recipe_next_absent_verified": False}, {"reviewed_menu": "创意"}):
             attempt = dict(review, facts=dict(review["facts"], **fields))
             with self.subTest(fields=fields), self.assertRaises(m.Blocked):
                 self.call(item, "observe", attempt)
@@ -185,6 +196,103 @@ class MuMuDailyTests(unittest.TestCase):
         self.assertNotIn("before", result)
         # An explicitly reviewed free option appearing later is a separate reservation.
         self.call(item, "reserve", self.review(item, seconds=2), seconds=2)
+
+    def test_cooking_actual_free_entry_and_meal_only(self):
+        item = "cooking"
+        for f in ({"recipe_control": "前往升级"}, {"menu": "创意"}, {"fee_or_premium_prompt": True}):
+            with self.assertRaises(m.Blocked):
+                self.call(item, "reserve", self.review(item, **f))
+        self.call(item, "reserve", self.review(item))
+        r = self.review(item, seconds=1, cooking_task_progress="1/1", active_meal_effect_reviewed=True)
+        with self.assertRaises(m.Blocked):
+            self.call(item, "verify", r, seconds=1)
+        r["screens"]["meal_effect"] = self.frame(self.now + dt.timedelta(seconds=1))
+        self.assertEqual(self.call(item, "verify", r, seconds=1)["status"], "verified")
+
+    def test_activity_authorization_binding_and_no_replay(self):
+        from unittest.mock import patch
+        scope = dict(mode="event-stage", activity="synthetic event", stage="S-1", difficulty="normal",
+                     cycle="synthetic window", attempt=1, quota_type="free-attempt")
+        item = m.scope_key(scope)
+        def reviewed(key=item, seconds=0, remaining=2, **updates):
+            f = dict(activity_scope=scope, window_start=(self.now-dt.timedelta(days=1)).isoformat(),
+                     window_end=(self.now+dt.timedelta(days=3)).isoformat(), stamina_cost=0,
+                     stamina=42, purchase_or_refill_prompt=False, quota_remaining=remaining,
+                     ticket_per_attempt=0, explicitly_selected_current_attempt=True, entry_tap_xy=[10, 10])
+            f.update(updates)
+            r = self.review(key, seconds=seconds, **f)
+            at = self.now+dt.timedelta(seconds=seconds)
+            r["screens"]["quota"] = self.frame(at)
+            ref = self.root/"evidence"/"mock-proof.json"
+            ref.write_text("{}")
+            r["probe_proof"] = str(ref)
+            s = r["screens"]["primary"]
+            doc = {"frame": {"path": Path(s["path"]).relative_to(self.root).as_posix(), "sha256":s["sha256"]},
+                   "captured_at":s["captured_at"], "identity":dict(self.binding,pid=600)}
+            return r, doc
+        for f in ({"stamina_cost": 1}, {"stamina_cost": False}, {"purchase_or_refill_prompt": True},
+                  {"ticket_per_attempt": 1}, {"quota_remaining": 0}, {"window_end": self.now.isoformat()},
+                  {"activity_scope": dict(scope, stage="S-2")}):
+            r, doc = reviewed(**f)
+            with patch("mumu_guest.proof",return_value=doc), self.assertRaises(m.Blocked):
+                self.call(item, "reserve", r)
+        second = dict(scope, attempt=2)
+        second_item = m.scope_key(second)
+        r, doc = reviewed(second_item, activity_scope=second)
+        with patch("mumu_guest.proof",return_value=doc), self.assertRaisesRegex(m.Blocked,"prior ordered attempt"):
+            self.call(second_item, "reserve", r)
+        r, doc = reviewed()
+        unproved = dict(r); unproved.pop("probe_proof")
+        with self.assertRaisesRegex(m.Blocked,"exact GF2 probe"):
+            self.call(item, "reserve", unproved)
+        with patch("mumu_guest.proof",return_value=doc):
+            self.call(item, "reserve", r)
+        self.assertIn(item, m.current_items(self.root,"gf2",self.now + dt.timedelta(days=1)))
+        for count, sta in ((2, 42), (1, 41)):
+            r, doc = reviewed(seconds=1, remaining=count, stamina=sta, result="clear",
+                              no_stamina_use_verified=True)
+            with patch("mumu_guest.proof",return_value=doc), self.assertRaises(m.Blocked):
+                self.call(item, "verify", r, seconds=1)
+        r, doc = reviewed(seconds=2, remaining=1, stamina=43, result="clear", no_stamina_use_verified=True)
+        with patch("mumu_guest.proof",return_value=doc):
+            self.assertEqual(self.call(item,"verify",r,seconds=2)["status"],"verified")
+        self.assertEqual(item,m.scope_key(dict(scope,quota_type="existing-ticket")))
+        r,doc=reviewed(seconds=86400)
+        with patch("mumu_guest.proof",return_value=doc), self.assertRaisesRegex(m.Blocked,"prior completion"):
+            self.call(item,"reserve",r,seconds=86400)
+        r,doc=reviewed(second_item, seconds=86400, activity_scope=second, remaining=1)
+        with patch("mumu_guest.proof",return_value=doc):
+            self.assertEqual(self.call(second_item,"reserve",r,seconds=86400)["status"],"reserved")
+
+    def test_reviewed_material_batch_checks_closed_window_quota_and_exact_reward(self):
+        from gf2_zero_stamina import MATERIAL_SCOPE, activity_review
+        at = "2026-11-26T20:00:00+08:00"
+        scope = dict(MATERIAL_SCOPE)
+        item = m.scope_key(scope)
+        facts = dict(activity_scope=scope, window_start="2026-11-26T04:00:00+08:00",
+                     window_end=scope["cycle"], stamina=31, stamina_cost=0,
+                     purchase_or_refill_prompt=False, quota_remaining=3, ticket="真爱勋章",
+                     ticket_capacity=6, ticket_per_attempt=1, use_existing_ticket_authorized=True,
+                     all_three_stage_objectives=True, selected_runs=3, exact_batch_authorized=True,
+                     confirmation_title="自律准备", confirmation_control="确认", confirmation_enabled=True,
+                     explicitly_selected_current_attempt=True, entry_tap_xy=[10, 10])
+        d = dict(facts=facts, guest_identity={"pid":10}, at=at,
+                 screens={x: {"captured_at":at} for x in ("primary","quota")})
+        for change in ({"ticket": "wrong"}, {"ticket_capacity": 9}, {"quota_remaining": 2},
+                       {"quota_remaining": 7}, {"confirmation_title": "购买"}, {"selected_runs": 4},
+                       {"window_end": "2026-12-21T04:59:00+08:00"}, {"entry_tap_xy": [True,10]}):
+            with self.subTest(change=change), self.assertRaises(m.Blocked):
+                activity_review(item,"reserve",dict(d,facts=dict(facts,**change)),None)
+        activity_review(item,"reserve",d,None)
+        after = dict(facts,quota_remaining=0,result="sweep-complete",no_stamina_use_verified=True,
+                     reward_name="粉丝点赞", reward_quantity=3000)
+        result = dict(d,facts=after,screens={**d["screens"],"reward":{"captured_at":at}})
+        for change in ({"reward_quantity": 2000}, {"reward_name":"wrong"}, {"quota_remaining": 1}, {"stamina": 30}):
+            with self.subTest(change=change), self.assertRaises(m.Blocked):
+                activity_review(item,"verify",dict(result,facts=dict(after,**change)),{"before":d})
+        activity_review(item,"verify",result,{"before":d})
+        with self.assertRaises(m.Blocked):
+            activity_review(item,"reserve",dict(d,at=scope["cycle"]),None)
 
     def test_locked_gf2_needs_exact_guest_proof_and_continuity(self):
         from unittest.mock import patch

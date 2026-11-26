@@ -116,6 +116,30 @@ class GuestCliTests(unittest.TestCase):
         self.assertFalse(response["game_action_performed"])
         self.assertIn(why, response["reason"])
 
+    def test_activity_confirmation_matches_exact_probe_and_point(self):
+        import mumu_daily as d
+        from gf2_zero_stamina import scope_key
+        result = self.probe()
+        probe = self.root / result["probe"]
+        doc = json.loads(probe.read_text(encoding="utf-8"))
+        at = g.stamp(doc["captured_at"])
+        item = scope_key(dict(mode="event-stage", activity="synthetic event", stage="S-1", difficulty="normal",
+                              cycle="c1", attempt=1, quota_type="free-attempt"))
+        bound = {key:self.cfg[key] for key in ("vm_index","serial")}
+        record = dict(status="reserved", before=dict(binding=bound, guest_identity=doc["identity"],
+                      guest_proof={"sha256":g.sha(probe.read_bytes())}, facts=dict(
+                      entry_tap_xy=[11,22], window_start=(at-dt.timedelta(seconds=1)).isoformat(),
+                      window_end=(at+dt.timedelta(hours=1)).isoformat())))
+        with patch.object(d, "load_record",return_value=record):
+            bad = self.cli("tap", "--probe-proof", result["probe"], "--reviewed-frame",
+                           "--xy","12","22","--item",item)
+            self.expect_blocked(bad,"exact entry tap")
+            code, response = self.tap(result, "--item", item)
+            self.assertEqual(code,0,response)
+            self.assertTrue(response["game_action_performed"])
+            self.expect_blocked(self.tap(result,"--item",item),"File exists")
+        self.assertEqual(len(self.inputs),1)
+
     def test_probe_tap_new_proof_and_one_shot(self):
         before = self.probe()
         self.assertEqual(self.auth, [])

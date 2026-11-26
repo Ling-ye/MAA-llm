@@ -6,6 +6,7 @@ import re
 import unicodedata
 from pathlib import Path
 
+from gf2_zero_stamina import MATERIAL_SCOPE, MODES, QUOTAS, RESULT, SCOPE, activity_review, key_format, scope_key
 from project_paths import config_path, require_execution
 from runner import exclusive_lock, read_json
 from supervised_evidence import Blocked, contained, image_size, integer, need, save, seal, sha, stamp
@@ -128,6 +129,8 @@ def game_day(now):
 
 
 def period(item, now):
+    if key_format(item):
+        return "activities"
     # GF2's recipe archive shows a 05:00 CN reset for drinks, not the
     # generic 04:00 game-day boundary used for other items.
     if item == "tea":
@@ -147,15 +150,38 @@ def checklist(game):
              **({"optional_explicit_scope": True} if item == "sanity-event-stage" else {}),
              **({"reset_cn": "05:00", "before_roles": ["primary", "confirm"],
                  "after_roles": ["primary", "drink_effect"]} if item == "tea" else {}),
-             **({"ineligible_roles": ["primary", "creative", "archive"]} if item == "cooking" else {})}
+             **({"before_roles": ["primary", "recipe"], "after_roles": ["primary", "meal_effect"],
+                 "ineligible_roles": ["primary", "regular"]} if item == "cooking" else {})}
             for item, (before, after) in ITEMS[game].items()]
+
+
+def item_checks(game, item):
+    if game == "gf2" and key_format(item):
+        return SCOPE, RESULT
+    need(item in ITEMS[game], "unknown item")
+    return ITEMS[game][item]
+
+
+def current_items(root, game, now):
+    names = list(ITEMS[game])
+    if game == "gf2":
+        path = contained(root, "state/mumu/gf2/activities")
+        names.extend(sorted(p.stem for p in path.glob("activity-*.json") if key_format(p.stem)))
+    return names
 
 
 def route(game):
     return {"game": game, "transport": "mumu", "package": PACKAGES[game],
             "reviewed_maa_version": VERSIONS[game], "validation": VALIDATION[game],
             "native_fallback": False, "game_action_performed": False,
-            "automatic_game_input": False, "checklist": checklist(game)}
+            "automatic_game_input": False, "checklist": checklist(game),
+            **({"opt_in_activity_scope": {
+                "automatic": False, "required_input": "explicit one-stage scope",
+                "modes": sorted(MODES), "quota_types": sorted(QUOTAS),
+                "before_checks": SCOPE.split(), "after_checks": RESULT.split(),
+                "reviewed_material_batch": {"scope": dict(MATERIAL_SCOPE), "max_runs": 3}
+            }}
+               if game == "gf2" else {})}
 
 
 def path_for(root, game, item, now):
@@ -179,8 +205,7 @@ def load_record(root, game, item, now):
 
 def reported_state(root, game, now):
     rows = []
-    for entry in checklist(game):
-        item = entry["id"]
+    for item in current_items(root, game, now):
         try:
             record = load_record(root, game, item, now)
             row = {"id": item, "period": period(item, now),
@@ -297,6 +322,23 @@ def specific_review(item, stage, data, record):
                  "actual drink effect plus completed tea task required; cooking effect is not proof")
             if before:
                 need(before.get("recipe") == f["recipe"], "result is not bound to the reserved beverage")
+    if item == "cooking":
+        need(f.get("recipe") == "芝士烤土豆" and f.get("menu") == "常规菜品",
+             "only the reviewed standard baked potato route is covered")
+        if stage == "reserve":
+            need("recipe" in data["screens"] and f.get("recipe_control") == "下一步"
+                 and f.get("final_control") == "确认邀请" and f.get("first_serving_free_visible") is True
+                 and f.get("fee_or_premium_prompt") is False and f.get("cooking_task_progress") == "0/1",
+                 "standard recipe and final invitation, actual first-free text and 0/1 required")
+        else:
+            need("meal_effect" in data["screens"] and f.get("cooking_task_progress") == "1/1"
+                 and f.get("active_meal_effect_reviewed") is True,
+                 "actual active meal effect and cooking 1/1 required")
+            if before:
+                need(before.get("recipe") == f["recipe"] and before.get("menu") == f["menu"],
+                     "cooking result not bound to reserved recipe")
+    if key_format(item):
+        activity_review(item, stage, data, record)
     if item == "sanity-event-stage":
         stage_id, mode = f.get("stage"), f.get("mode")
         need(isinstance(stage_id, str) and re.fullmatch(r"[A-Z]{1,5}-[1-9][0-9]{0,2}", stage_id)
@@ -396,7 +438,7 @@ def specific_review(item, stage, data, record):
 
 def mutate(root, game, item, action, review, reason, now, *, authorize=require_execution, bind=binding):
     root = Path(root).resolve()
-    need(item in ITEMS[game], "unknown item")
+    scope, result_checks = item_checks(game, item)
     authorize(game)
     need(not (root/"STOP").exists(), "STOP exists")
     if game == "endfield":
@@ -414,7 +456,6 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
         obs = frame(root, review, game, item, now, bind(game),
                     close_result=(item == "close" and action != "reserve"))
         facts = obs["facts"]
-        scope, result_checks = ITEMS[game][item]
         if action == "reserve":
             if game == "gf2":
                 from mumu_guest import guard_replay
@@ -422,7 +463,7 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
             need(not previous or previous["status"] == "observed_ineligible",
                  "existing attempt or prior completion; inspect and do not replay")
             for other_game in ITEMS:
-                for other_item in ITEMS[other_game]:
+                for other_item in current_items(root, other_game, now):
                     if (other_game, other_item) == (game, item):
                         continue
                     other = load_record(root, other_game, other_item, now)
@@ -435,12 +476,24 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
                     need(r and r["status"] in ("verified", "observed_already_done", "observed_ineligible"),
                          "review stored puzzle and production independently before sweeping")
             specific_review(item, action, obs, None)
+            if key_format(item):
+                activity = facts["activity_scope"]
+                if activity["attempt"] > 1:
+                    prev_item = scope_key({**activity, "attempt": activity["attempt"] - 1})
+                    prev = load_record(root, game, prev_item, now)
+                    need(prev and prev["status"] == "verified", "prior ordered attempt not verified")
+                    prior = prev["after"]["facts"]
+                    need(prior["activity_scope"]["quota_type"] == activity["quota_type"] and
+                         prior["quota_remaining"] == facts["quota_remaining"] and
+                         all(prior.get(field) == facts.get(field)
+                             for field in ("ticket", "window_start", "window_end")),
+                         "activity quota or window changed since prior attempt")
             data = {"schema": 1, "game": game, "item": item, "period": period(item, now),
                     "status": "reserved", "before": obs, "history": previous.get("history", []) if previous else []}
         elif action == "verify":
             need(previous and previous["status"] == "reserved", "no matching reservation; never create success retroactively")
             start = previous["before"]
-            need(start["binding"] == obs["binding"] and (item == "tea" or start["day"] == obs["day"]),
+            need(start["binding"] == obs["binding"] and (item == "tea" or key_format(item) or start["day"] == obs["day"]),
                  "reservation context changed")
             if start.get("guest_identity"):
                 need(start["guest_identity"] == obs.get("guest_identity"),
@@ -454,6 +507,7 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
             specific_review(item, action, obs, previous)
             data = {**previous, "status": "verified", "after": obs}
         elif action == "observe":
+            need(not key_format(item), "activity results require individual reservation and verification")
             need(not previous or previous["status"] == "observed_ineligible",
                  "existing attempt or terminal result cannot be replaced")
             outcome = review.get("observation")
@@ -466,14 +520,11 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
                 need(outcome == "ineligible" and review.get("reason") in allowed, "unapproved skip or unknown state")
                 all_true(facts, "exact_ineligibility_visually_confirmed")
                 if item == "cooking" and review["reason"] == "no_eligible_free_recipe":
-                    need({"primary", "creative", "archive"} <= obs["screens"].keys()
-                         and facts.get("cooking_task_progress") == "0/1"
-                         and facts.get("research_notice") == "暂无可选择食材"
-                         and facts.get("creative_notice") == "暂无可选择菜谱"
-                         and facts.get("archive_recipe") == "芝士烤土豆"
-                         and facts.get("archive_control") == "前往升级"
-                         and facts.get("free_regular_action_absent") is True,
-                         "verify both empty modes, read-only recipe and incomplete cooking task")
+                    need("regular" in obs["screens"] and facts.get("cooking_task_progress") == "0/1"
+                         and facts.get("reviewed_menu") == "常规菜品"
+                         and facts.get("regular_first_free_unavailable_verified") is True
+                         and facts.get("standard_recipe_next_absent_verified") is True,
+                         "must review actual standard recipes; other tabs or the read-only archive are not proof")
                 status = "observed_ineligible"
             data = {"schema": 1, "game": game, "item": item, "period": period(item, now),
                     "status": status, "observation": obs, "history": previous.get("history", []) if previous else []}
@@ -490,7 +541,7 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("plan", "status", "reserve", "verify", "observe", "mark-unknown"))
+    parser.add_argument("action", choices=("plan", "status", "activity-key", "reserve", "verify", "observe", "mark-unknown"))
     parser.add_argument("--game", choices=PACKAGES, required=True)
     parser.add_argument("--item")
     parser.add_argument("--review", type=Path)
@@ -502,6 +553,9 @@ def main(argv=None):
             result = route(args.game)
         elif args.action == "status":
             result = reported_state(ROOT, args.game, now)
+        elif args.action == "activity-key":
+            need(args.game == "gf2" and args.review, "GF2 activity scope JSON is required")
+            result = {"item": scope_key(read_json(args.review)), "game_action_performed": False}
         else:
             review = read_json(args.review) if args.review else {}
             result = mutate(ROOT, args.game, args.item, args.action, review, args.reason, now)

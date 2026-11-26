@@ -35,9 +35,24 @@
 | dispatch-production | 同入口，selected_method=资源生产、price=0、记录 stored，并另附 reward 帧。先核对拼图和生产，再做突破扫荡；不是领取派遣/重派或周档 |
 | weekly-free-box | location=[商城,品质甄选,臻品礼包,主题精选]、product=周周乐补给箱、price_text=免费、price=0、paid_balance。预约核对 limit=周限购1/1、control=购买、progress=goal；提交一次；验收同一周货项剩余0、付费余额不变及 reward 帧。相邻商品换位不是重试理由 |
 | dispatch-weekly-* | facts.tier 必须精确匹配档位；实际周重置需复核，观察未解锁档不等于已领 |
-| cooking | 未见可用的免费常规制作，且任务仍为 0/1 时可用 observe，observation=ineligible、reason=no_eligible_free_recipe。需 screens.primary（自研：暂无可选择食材）、creative（创意：暂无可选择菜谱）、archive（芝士烤土豆只有前往升级），并在 facts 填 cooking_task_progress=0/1、research_notice、creative_notice、archive_recipe=芝士烤土豆、archive_control=前往升级、free_regular_action_absent=true。只是当次未完成记录，不开付费、升级或替代动作。 |
+| cooking | 预约：`recipe=芝士烤土豆`、`menu=常规菜品`、`recipe_control=下一步`、`final_control=确认邀请`、`first_serving_free_visible=true`、`fee_or_premium_prompt=false`、`cooking_task_progress=0/1`，另附 `recipe` 帧；主画面证据为最终邀请页。验收：同菜品/菜单、`cooking_task_progress=1/1`、`active_meal_effect_reviewed=true` 和 `meal_effect` 帧。不适用只接受实际「常规菜品」`regular` 帧，任务 0/1 及 `reviewed_menu=常规菜品`、`regular_first_free_unavailable_verified=true`、`standard_recipe_next_absent_verified=true`。档案「前往升级」或其他模式无材料不能证明。 |
 | tea | 预约：recipe=红枣茶、recipe_level=4、confirmation_recipe=红枣茶、cost_reviewed_free=true、fee_or_premium_prompt=false、free_uses_remaining=1；另附 confirm 帧。验收：tea_task_progress=1/1、cup_active_reviewed=true、effect_type=饮品加成、effect_text=每消耗10情报拼图，可获取2~3数据链路，另附 drink_effect 帧。菜品加成、单独任务计数或制作后弹窗均不能替代。 |
 | event-material | event=热寂悖论、stage=DF-1-5 于乱流中 V、material_mode=true；已知战斗截止后只观察，不替换活动 |
+
+## 少前 2：仅当次授权的零体力活动
+
+这是监督证据机制，不是活动发现器或通关机器人。先在游戏里确认真实可进入的单关，禁止为了填字段捏造关卡、费用、周期或票数。主线、定时任务和旧热寂悖论入口不走此分支。已核验的「直播重连世界海 → 物资模式 → KF-1-5 打榜任务V」有单独有限批次适配，活动挑战未开放和剧情模式不能冒充该关。完成或未核实均不会自动转下一关。
+
+1. 写独立的本地范围 JSON：`mode` 取 `event-stage` / `permanent-challenge`，`activity`、`stage`、`difficulty`、`cycle` 填当前画面精确名称或周期标识，`attempt` 从 1 顺序，`quota_type` 为 `first-clear`、`free-attempt`，另外授权用现有单张票才选 `existing-ticket`。同周期同关范围不要改名来重试；不同额度类型共用同一尝试标识，日常重置也不会解除已提交记录。
+2. `python scripts/mumu_daily.py activity-key --game gf2 --review <scope.json>` 返回该尝试的 `item`。按正常 MuMu 核验格式填写 reserve，`facts.activity_scope` 放该范围对象；`facts.window_start`、`window_end` 为带时区已核实开放前后界限，需 `stamina_cost=0`、`stamina`、`quota_remaining`、`purchase_or_refill_prompt=false`、`explicitly_selected_current_attempt=true`。首通标为 `first_clear_pending=true`，额度 1；其他免费路径 `ticket_per_attempt=0`；票路径再填 `ticket`、`ticket_per_attempt=1`、`use_existing_ticket_authorized=true`。相应 attestations：`exact_activity_and_stage_authorized actual_game_cost_reviewed one_attempt_only no_auto_repeat no_refill no_purchase current_exact_item_eligible`。
+3. `screens.primary` 是精确选择好、已核实一次点击提交的当前画面，也是 `probe_proof` 对应的全帧（无论宿主机锁屏与否）；另给当前 `screens.quota`。与该键匹配的受监督 `mumu_guest.py tap --item` 才放行，且只接受预约使用的全帧、当前周期，以及事前核到确认按钮内的原图整数坐标 `facts.entry_tap_xy=[x,y]`。禁止换帧重放；如果选关还需要其他步骤，先在无消耗导航里走到就绪状态。
+4. Verify 必须同范围、同费用、同窗口与同 guest，提供更新的全帧和独立额度证据；普通单关 `result=clear`（下述自律单独使用 `sweep-complete`）、`no_stamina_use_verified=true`、体力不减少（允许自然恢复），额度恰降 1，首通标记变 false，并明确核对 `same_activity_and_stage_result clear_and_reward_verified debit_and_quota_reviewed`。不明应 mark-unknown，不能跳过旧提交去下一次同关；下一次必须衔接旧核验余额并重新预约。结果不是客户端截图自动识别，到账判断由监督者负责。
+
+### 直播重连世界海：确认现有券及终止时间
+
+当前只接受范围 `{"mode":"event-material-sweep","activity":"直播重连世界海","stage":"KF-1-5 打榜任务V","difficulty":"物资模式","cycle":"2026-12-15T08:59:00+08:00","attempt":1,"quota_type":"existing-ticket"}`。关卡战斗于北京时间 2026-12-15 08:59 截止，兑换另至 12-21 04:59，兑换期不是刷关期（战斗期见[官方主题活动预告](https://www.taptap.cn/moment/873954188269193197?group_id=232066)）。选择已三星且具备自律的单关。另填 `ticket=真爱勋章`、`ticket_capacity=6`、`all_three_stage_objectives=true`、`exact_batch_authorized=true`、`selected_runs`（1–3，不大于现存券）、`confirmation_title=自律准备`、`confirmation_control=确认`、`confirmation_enabled=true`，在最终确认面板预约，一次提交整批。核验填 `result=sweep-complete`，附 `reward` 帧和 `reward_name=粉丝点赞`、`reward_quantity`（每次 ×1000）。奖励弹窗不显示关卡或次数，须与预约时同关选定次数、所附结算画面及同活动票券扣量共同验收；额度必须恰减选定次数、体力不扣；禁止补券、改关、拆单重试或自动选择其他活动。普通单关仍只允许一次。
+
+同活动「开播推流」单独核对：仅领取页面已达标且可领的任务，例如「决策构象」2/2，核验单条绿勾与对应「粉丝点赞 ×50」。北京时间 05:00 按页面实核重置；不把「军备解析」/「定向精研」当零体力项目，也不因以前用过体力而再消耗体力补单。非本自律凭证，不用扫荡扣券程序领任务。
 
 ## 明日方舟：仅记录明确授权的短期活动代理
 

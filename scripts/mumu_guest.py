@@ -372,9 +372,11 @@ def gesture(root, guest, action, receipt, xy, *, reviewed, navigation, item, aut
         stop(root)
         expected = proof(root,receipt,guest.game,guest.cfg,utcnow())
         guard_replay(root)
+        activity_end = None
         if item:
-            from mumu_daily import ITEMS, load_record
-            need(item in ITEMS["gf2"], "unknown daily item")
+            from gf2_zero_stamina import key_format
+            from mumu_daily import item_checks, load_record
+            item_checks("gf2", item)
             row = load_record(root,"gf2",item,utcnow())
             before = row.get("before", {}) if row else {}
             need(row and row.get("status") == "reserved" and before.get("binding") ==
@@ -383,10 +385,18 @@ def gesture(root, guest, action, receipt, xy, *, reviewed, navigation, item, aut
             if before.get("guest_identity"):
                 need(before["guest_identity"] == expected["identity"],
                      "guest identity changed since item reservation")
+            if key_format(item):
+                activity_end = stamp(before["facts"]["window_end"])
+                need(action == "tap" and list(xy) == before["facts"]["entry_tap_xy"] and
+                     before["guest_proof"]["sha256"] ==
+                     sha(contained(root, receipt).read_bytes()) and
+                     stamp(before["facts"]["window_start"]) <= utcnow() <
+                     activity_end,
+                     "activity attempt permits one exact entry tap from its reserved GF2 proof")
         else:
-            from mumu_daily import ITEMS, load_record
+            from mumu_daily import current_items, load_record
             need(not any((load_record(root,"gf2",name,utcnow()) or {}).get("status") == "reserved"
-                         for name in ITEMS["gf2"]), "finish the reserved GF2 item before unscoped navigation")
+                         for name in current_items(root, "gf2", utcnow())), "finish the reserved GF2 item before unscoped navigation")
         current = guest.capture()
         ident, image, current_at, size = current
         glyph_box = None
@@ -442,6 +452,7 @@ def gesture(root, guest, action, receipt, xy, *, reviewed, navigation, item, aut
         used = contained(root,"state/guest-steps/"+expected["integrity_sha256"]+".json")
         used.parent.mkdir(parents=True,exist_ok=True)
         stop(root)
+        need(activity_end is None or utcnow() < activity_end, "activity combat window has ended")
         submission = {"status":"reserved_no_replay", "action":action, "game":guest.game,
                       "item":item, "probe_sha256":expected["integrity_sha256"],
                       "submitted_at":utcnow().isoformat()}
@@ -449,6 +460,7 @@ def gesture(root, guest, action, receipt, xy, *, reviewed, navigation, item, aut
         save(unresolved(root), submission)
         try:
             need(guest.identity() == ident, "official app changed just before input")
+            need(activity_end is None or utcnow() < activity_end, "activity combat window has ended")
             guest.adb("shell","input",action,*(str(i) for i in xy))
             time.sleep(0.5)
             later = guest.capture()
