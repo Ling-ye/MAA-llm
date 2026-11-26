@@ -25,6 +25,12 @@ HERO_SCOPE = {
     "difficulty": "英雄难度", "cycle": MATERIAL_SCOPE["cycle"], "attempt": 1, "quota_type": "first-clear",
 }
 
+HERO_BRANCH_SCOPE = dict(HERO_SCOPE, stage="KZ-1-1 直播推送中I")
+HERO_PROFILES = {
+    HERO_SCOPE["stage"]: (HERO_SCOPE, "within_eight_rounds_credited", "KS-1-4", 50),
+    HERO_BRANCH_SCOPE["stage"]: (HERO_BRANCH_SCOPE, "within_seven_rounds_credited", "KZ-1-2", 30),
+}
+
 
 def key_format(item):
     return isinstance(item, str) and re.fullmatch(r"activity-[a-f0-9]{24}", item) is not None
@@ -48,8 +54,8 @@ def scope_key(scope):
         need(scope["attempt"] == 1, "first clear is never replayed")
     if scope["mode"] == "event-material-sweep":
         need(scope == MATERIAL_SCOPE, "material sweep must match the reviewed exact event stage and cutoff")
-    if (scope["activity"], scope["stage"]) == (HERO_SCOPE["activity"], HERO_SCOPE["stage"]):
-        need(scope == HERO_SCOPE, "match the reviewed story-Hero first-clear scope")
+    if scope["activity"] == HERO_SCOPE["activity"] and scope["stage"] in HERO_PROFILES:
+        need(scope == HERO_PROFILES[scope["stage"]][0], "match the reviewed story-Hero first-clear scope")
     # Quota type is intentionally not part of the identity: relabeling cannot replay an attempt.
     identity = {k: v for k, v in scope.items() if k != "quota_type"}
     raw = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
@@ -97,8 +103,10 @@ def activity_review(item, action, data, record):
             need("reward" in shots and f.get("reward_name") == "粉丝点赞" and
                  type(f.get("reward_quantity")) is int and f["reward_quantity"] == 1000 * units,
                  "expected live reward and exact quantity must match requested sweep count")
-    if scope == HERO_SCOPE:
-        need(closed == stamp(HERO_SCOPE["cycle"]), "story-Hero combat deadline changed")
+    hero = HERO_PROFILES.get(scope["stage"])
+    if hero and scope == hero[0]:
+        _, round_goal, next_stage, reward_count = hero
+        need(closed == stamp(scope["cycle"]), "story-Hero combat deadline changed")
         progress = f.get("chapter_objectives")
         need(integer(progress) and 0 <= progress <= 45 and type(f.get("chapter_objective_cap")) is int
              and f["chapter_objective_cap"] == 45,
@@ -109,12 +117,12 @@ def activity_review(item, action, data, record):
                  "review actual story-Hero entry, team and any authorized assist")
         else:
             need({"reward", "map"} <= shots.keys() and f.get("win_objective_credited") is True and
-                 f.get("same_hero_stage_complete_on_map") is True and f.get("unlocked_stage_id") == "KS-1-4" and
+                 f.get("same_hero_stage_complete_on_map") is True and f.get("unlocked_stage_id") == next_stage and
                  record is not None and progress == record["before"]["facts"]["chapter_objectives"] + 3 and
-                 f.get("within_eight_rounds_credited") is True and
+                 f.get(round_goal) is True and
                  f.get("at_most_one_allied_loss_credited") is True and
                  f.get("reward_name") == "坍塌晶条" and type(f.get("reward_quantity")) is int and
-                 f["reward_quantity"] == 50,
+                 f["reward_quantity"] == reward_count,
                  "story-Hero result must credit all exact objectives and the verified first-clear reward")
     if action == "reserve":
         point = f.get("entry_tap_xy")

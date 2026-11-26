@@ -7,7 +7,7 @@ import unicodedata
 from pathlib import Path
 
 from gf2_zero_stamina import (
-    HERO_SCOPE, MATERIAL_SCOPE, MODES, QUOTAS, RESULT, SCOPE, activity_review, key_format, scope_key,
+    HERO_BRANCH_SCOPE, HERO_SCOPE, MATERIAL_SCOPE, MODES, QUOTAS, RESULT, SCOPE, activity_review, key_format, scope_key,
 )
 from project_paths import config_path, require_execution
 from runner import exclusive_lock, read_json
@@ -183,6 +183,7 @@ def route(game):
                 "before_checks": SCOPE.split(), "after_checks": RESULT.split(),
                 "reviewed_material_batch": {"scope": dict(MATERIAL_SCOPE), "max_runs": 3},
                 "reviewed_story_hero": {"scope": dict(HERO_SCOPE), "battle_control": False},
+                "reviewed_story_hero_branch": {"scope": dict(HERO_BRANCH_SCOPE), "battle_control": False},
             }}
                if game == "gf2" else {})}
 

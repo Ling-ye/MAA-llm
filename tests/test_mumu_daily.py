@@ -327,6 +327,39 @@ class MuMuDailyTests(unittest.TestCase):
                 activity_review(item,"verify",dict(result,facts=dict(after,**change)),{"before":d})
         activity_review(item,"verify",result,{"before":d})
 
+    def test_story_hero_branch_requires_seven_rounds_and_exact_next_stage(self):
+        from gf2_zero_stamina import HERO_BRANCH_SCOPE, activity_review
+        at = "2026-11-26T20:00:00+08:00"
+        scope = dict(HERO_BRANCH_SCOPE)
+        item = m.scope_key(scope)
+        for scope_changes in ({"difficulty": "普通"}, {"quota_type": "free-attempt"},
+                              {"mode": "permanent-challenge"}, {"cycle":"different"}):
+            with self.subTest(scope_changes=scope_changes), self.assertRaises(m.Blocked):
+                m.scope_key(dict(scope,**scope_changes))
+        facts = dict(activity_scope=scope, window_start="2026-11-26T04:00:00+08:00",
+                     window_end=scope["cycle"], stamina=31, stamina_cost=0,
+                     purchase_or_refill_prompt=False, quota_remaining=1, ticket_per_attempt=0,
+                     first_clear_pending=True, explicitly_selected_current_attempt=True, entry_tap_xy=[10, 10],
+                     challenge_control="挑战", reviewed_story_hero_mode=True, team_and_any_assist_reviewed=True,
+                     chapter_objectives=3, chapter_objective_cap=45)
+        d = dict(facts=facts, guest_identity={"pid": 10}, at=at,
+                 screens={x: {"captured_at": at} for x in ("primary","quota","map","stage")})
+        for change in ({"reviewed_story_hero_mode": False}, {"team_and_any_assist_reviewed":False},
+                       {"challenge_control": "观看"}, {"stamina_cost": 1}):
+            with self.subTest(change=change), self.assertRaises(m.Blocked):
+                activity_review(item,"reserve",dict(d,facts=dict(facts,**change)),None)
+        activity_review(item,"reserve",d,None)
+        after = dict(facts,quota_remaining=0,result="clear",no_stamina_use_verified=True, first_clear_pending=False,
+                     win_objective_credited=True, within_seven_rounds_credited=True, at_most_one_allied_loss_credited=True,
+                     same_hero_stage_complete_on_map=True, unlocked_stage_id="KZ-1-2", chapter_objectives=6,
+                     reward_name="坍塌晶条", reward_quantity=30)
+        result = dict(d, facts=after, screens={**d["screens"],"reward": {"captured_at":at}})
+        for change in ({"chapter_objectives": 5}, {"unlocked_stage_id": "KZ-1-1"}, {"reward_quantity": 50},
+                       {"within_seven_rounds_credited": False, "within_eight_rounds_credited": True}, {"at_most_one_allied_loss_credited": False}, {"first_clear_pending": True}):
+            with self.subTest(change=change), self.assertRaises(m.Blocked):
+                activity_review(item,"verify",dict(result,facts=dict(after,**change)),{"before":d})
+        activity_review(item,"verify",result,{"before":d})
+
     def test_locked_gf2_needs_exact_guest_proof_and_continuity(self):
         from unittest.mock import patch
         item = "tea"
