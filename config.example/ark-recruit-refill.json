@@ -1,0 +1,9 @@
+{
+  "stars": [3, 4, 5],
+  "duration_minutes": 540,
+  "slots": 4,
+  "permit_per_slot": 1,
+  "preserve": ["高级资深干员"],
+  "refresh": false,
+  "expedite": false
+}

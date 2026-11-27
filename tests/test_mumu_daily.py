@@ -5,6 +5,7 @@ import struct
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import mumu_daily as m
@@ -79,6 +80,42 @@ class MuMuDailyTests(unittest.TestCase):
             self.call(item, "reserve", self.review(item))
         with self.assertRaises(m.Blocked):
             self.call(item, "verify", self.review(item, seconds=4), seconds=4)
+
+    def test_refill_slot_uses_plan_reservation_and_one_permit(self):
+        import ark_recruit_refill as r
+        item = "recruit-refill-slot-1"
+        tags = ["近卫干员", "近战位", "重装干员", "防护", r.TOP]
+        # Synthetic minimal calculator input for exercising the actual journal.
+        pool = ([(6,"S",frozenset({r.TOP})),(3,"3",frozenset(tags[:-1])),
+                 (4,"4",frozenset({"重装干员"})),(5,"5",frozenset({"医疗干员",r.SENIOR}))],"fixture")
+        hold = self.review(item, game="arknights", slot=1, slot_state="empty",
+                           tags=tags, permit_count=4)
+        hold["screens"].update(overview=self.frame(self.now), confirm=self.frame(self.now))
+        hold.update(observation="ineligible", reason="top_senior_hold")
+        before = self.review(item, game="arknights", slot=1, slot_state="empty",
+                             tags=tags[:-1]+["医疗干员"], permit_count=4, paid_prompt=False,
+                             expedite_phase_ended=True, selected_tags=["医疗干员"],
+                             duration_minutes=540, permit_cost=1, lmd=100, quoted_lmd=0)
+        before["screens"].update(overview=self.frame(self.now), confirm=self.frame(self.now))
+        with patch.object(r, "read_pool", return_value=pool):
+            self.assertEqual(self.call(item, "observe", hold, game="arknights")["status"],
+                             "observed_ineligible")
+            with self.assertRaisesRegex(m.Blocked, "terminal"):
+                self.call(item, "reserve", before, game="arknights")
+        item = "recruit-refill-slot-2"
+        before.update(item=item)
+        before["facts"]["slot"] = 2
+        def review(slot, stage, data, record):
+            return r.review_slot(slot, stage, data, record, get_pool=lambda: pool, get_policy=lambda: r.POLICY)
+        with patch.object(m, "recruit_refill_review", side_effect=review):
+            self.assertEqual(self.call(item, "reserve", before, game="arknights")["status"], "reserved")
+            after = self.review(item, game="arknights", seconds=5, slot=2, slot_state="running",
+                                permit_count=3, lmd=100, selected_tags=["医疗干员"], remaining_seconds=32395,
+                                refresh_or_expedite_used=False)
+            after["screens"]["overview"] = self.frame(self.now + dt.timedelta(seconds=5))
+            self.assertEqual(self.call(item, "verify", after, seconds=5, game="arknights")["status"], "verified")
+            with self.assertRaisesRegex(m.Blocked, "existing attempt"):
+                self.call(item, "reserve", before, game="arknights")
 
     def test_reservation_blocks_other_game_till_reconciled(self):
         self.call("tea", "reserve", self.review("tea"))

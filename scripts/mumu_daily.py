@@ -9,6 +9,7 @@ from pathlib import Path
 from gf2_zero_stamina import (
     HERO_BRANCH_SCOPE, HERO_SCOPE, MATERIAL_SCOPE, MODES, QUOTAS, RESULT, SCOPE, activity_review, key_format, scope_key,
 )
+from ark_recruit_refill import review_skip as recruit_refill_skip, review_slot as recruit_refill_review, slot_number
 from project_paths import config_path, require_execution
 from runner import exclusive_lock, read_json
 from supervised_evidence import Blocked, contained, image_size, integer, need, save, seal, sha, stamp
@@ -31,6 +32,8 @@ ITEMS = {
             "same_stage_clear exact_completed_count sanity_delta_verified"),
         "public-recruit": ("operations_v2 high_priority_tags_protected refresh_policy_reviewed expedite_limit_reviewed",
                            "recruitment_slots_verified refresh_and_expedite_delta_verified"),
+        **{f"recruit-refill-slot-{slot}": ("same_slot_current_tags_reviewed", "same_slot_timer_and_cost_verified")
+           for slot in range(1, 5)},
         "base": ("operations_v2 full_facility_rotation money_trade_drone_only",
                  "rotation_verified collection_verified drone_delta_verified"),
         "credit-claim": ("operations_v2 free_credit_collection_only", "credit_collection_verified"),
@@ -108,6 +111,8 @@ ITEMS = {
 WEEKLY = {"weekly-free-box", *(f"dispatch-weekly-{tier}" for tier in (5, 10, 15, 25))}
 BEFORE_SWEEP = ("dispatch-stored-puzzle", "dispatch-production")
 SKIP = {
+    **{f"recruit-refill-slot-{slot}": {"top_senior_hold", "already_running", "no_permit"}
+       for slot in range(1, 5)},
     "sanity-tl9": {"stage_closed", "auto_deploy_unavailable", "no_eligible_resource"},
     "sanity-event-stage": {"stage_closed", "auto_deploy_unavailable", "no_eligible_resource"},
     "event-material": {"event_closed", "no_eligible_resource", "stage_unavailable"},
@@ -306,6 +311,8 @@ def frame(root, review, game, item, now, bound, *, close_result=False):
 def specific_review(item, stage, data, record):
     f = data["facts"]
     before = record["before"]["facts"] if record and stage == "verify" else None
+    if (slot := slot_number(item)) is not None:
+        recruit_refill_review(slot, stage, data, record)
     if item == "tea":
         tea_period = period(item, stamp(data["at"]))
         need(all(period(item, stamp(shot["captured_at"])) == tea_period for shot in data["screens"].values()),
@@ -466,6 +473,9 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
                 guard_replay(root)
             need(not previous or previous["status"] == "observed_ineligible",
                  "existing attempt or prior completion; inspect and do not replay")
+            if slot_number(item) is not None and previous:
+                need(previous.get("reason") == "no_permit",
+                     "protected or already running recruitment slot is terminal for this day")
             for other_game in ITEMS:
                 for other_item in current_items(root, other_game, now):
                     if (other_game, other_item) == (game, item):
@@ -515,6 +525,11 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
             need(not previous or previous["status"] == "observed_ineligible",
                  "existing attempt or terminal result cannot be replaced")
             outcome = review.get("observation")
+            refill_slot = slot_number(item)
+            if refill_slot is not None:
+                need(outcome == "ineligible", "refill observations must use exact slot skip evidence")
+                need(not previous or previous.get("reason") == "no_permit",
+                     "protected or already running recruitment slot is terminal for this day")
             if outcome == "already_done":
                 all_true(facts, scope + " " + result_checks + " prior_completion_visually_confirmed")
                 specific_review(item, action, obs, None)
@@ -523,6 +538,8 @@ def mutate(root, game, item, action, review, reason, now, *, authorize=require_e
                 allowed = set(SKIP.get(item, ()))
                 need(outcome == "ineligible" and review.get("reason") in allowed, "unapproved skip or unknown state")
                 all_true(facts, "exact_ineligibility_visually_confirmed")
+                if refill_slot is not None:
+                    recruit_refill_skip(refill_slot, review["reason"], obs)
                 if item == "cooking" and review["reason"] == "no_eligible_free_recipe":
                     need("regular" in obs["screens"] and facts.get("cooking_task_progress") == "0/1"
                          and facts.get("reviewed_menu") == "常规菜品"

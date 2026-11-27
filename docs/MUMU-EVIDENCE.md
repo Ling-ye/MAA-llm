@@ -78,3 +78,12 @@
 - 不让临时活动、历史观察或战斗 cutoff 成为其他关卡的默认授权。
 
 所有新账本存 `state/mumu/`、与旧执行入口共用本地 pipeline.lock；直接游戏操作仍由监督者确保同一时间只有唯一操作者。不要将状态、配置、证据、账号或实际收据提交至 Git。收据追踪过程，并不会将监督操作变成无人值守能力。
+
+## 明日方舟加急后公招补槽
+
+四槽各用一个按游戏日防重的项目：`recruit-refill-slot-1` 至 `recruit-refill-slot-4`。先按现有协议填专用 MuMu、官服包、当前日期、时间、截图哈希及通用监督字段。每个不同画面使用不同 PNG；`primary` 是基础画面，不能与其它角色重复。以下为附加字段：
+
+- `reserve`：`screens.overview` 为该槽空闲总览，`screens.confirm` 为同槽提交前标签、9 小时及许可画面。填写 `facts.slot`、`slot_state: "empty"`、`same_slot_current_tags_reviewed: true`、`current_exact_item_eligible: true`、`expedite_phase_ended: true`、`paid_prompt: false`、`tags`（按界面顺序五个）、`selected_tags`、`duration_minutes: 540`、`permit_cost: 1`、`permit_count`、`lmd` 和 `quoted_lmd`（未显示龙门币支出时为 0）。代码用本机国服表核对选择并把表哈希与计算结果存到预约。
+- `verify`：新鲜的 `screens.overview` 及相同 `slot`、`slot_state: "running"`、`selected_tags`、`remaining_seconds`、`permit_count`、`lmd`、`same_slot_timer_and_cost_verified: true`、`refresh_or_expedite_used: false`。必须看到同槽开始计时，许可恰减一，龙门币符合报价。
+- `observe`：用 `observation: "ineligible"`、`facts.exact_ineligibility_visually_confirmed: true` 和 `screens.overview`。进行中用 `already_running` 并填同槽计时；六星留空或许可不足用 `top_senior_hold` 或 `no_permit`，另附 `screens.confirm` 及同槽空闲、五标签、可见许可数。六星与在途的记录不可同日重开；仅许可不足且重新核验资格才可转预约。
+- 预约只记账，不发送触控。提交不明用现有 `mark-unknown` 或保留待核的预约；不重试。四槽一起看总览，不以原 v2 完成回调代替验收。

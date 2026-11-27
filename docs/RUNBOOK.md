@@ -25,10 +25,10 @@ python scripts/ark_operations_v2.py
 python scripts/ark_operations_v2.py --execute --home-reviewed --home-evidence scripts/evidence/<五分钟内主页>.png
 ~~~
 
-启动模拟器需要另外添加 --launch-emulator。runner 仅做基础任务、TL-9、允许的好友访问和奖励；公招/换班/信用购物只使用 v2。禁止把旧 operations、accelerated、补打战斗拼成另一次日常。
+启动模拟器需要另外添加 --launch-emulator。runner 仅做基础任务、TL-9、允许的好友访问和奖励；公招加急/换班/信用购物使用 v2；加急后的独立监督补槽另见方舟 Skill。禁止把旧 operations、accelerated、补打战斗拼成另一次日常。
 
 v2 固定顺序：Recruit → Infrast(mode=0 全设施集合) → Mall → Award。
-公招至多 4 次新招募、3/4 星九小时、标签刷新和加急开启；保护高级资深、资深和支援机械，force_refresh=false。v6.22.0 的 expedite_times 不能作为硬上限：在无外部并发招募的前提下，原有最多 4 槽加最多 4 次新招募，最多 8 次成功加急；实际消耗由资源前后值确认。
+v2 加急阶段至多 4 次新招募、3/4 星九小时、标签刷新和加急开启；保护高级资深、资深和支援机械，force_refresh=false。v6.22.0 的 expedite_times 不能作为硬上限：在无外部并发招募的前提下，原有最多 4 槽加最多 4 次新招募，最多 8 次成功加急；实际消耗由资源前后值确认。
 
 无人机只用于 Money 贸易站，不补货、不加工/训练/换助手、不交换或赠送线索。信用购物优先招聘许可，排除碳、家具、加急许可，不启用满信用强制购物。奖励任务不抽卡、不采矿、不领取源石相关奖励。
 
